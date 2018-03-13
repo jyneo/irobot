@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">irobot</string>
+    <string name="actionBar_name">irobot control system</string>
+    <string name="help_msg">1.Copy \"voc.dat\" to \"/sdcard/_irobot/voc.dat\".
+    \n2.Connect bluetooth to iRobot.
+    \n3.Copy latest \"libarcsoft_3d_tracking\" to \"/sdcard/_irobot\" for SDK updating.</string>
+    <string name="send_message">请输入要发送的信息</string>
+</resources>

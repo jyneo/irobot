@@ -1,0 +1,32 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragment.RobotCameraFragment">
+
+    <TextView
+        android:id="@+id/slam_status_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:text="[status]"/>
+
+    <RelativeLayout
+        style="@style/AppTheme.HorizontalViewGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#000">
+
+        <!--<com.arcsoft.irobot.widget.TrackedFrameView-->
+            <!--android:id="@+id/tracked_frame_view"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerHorizontal="true"-->
+            <!--res:aspectRatioWidth="1"-->
+            <!--res:aspectRatioHeight="1"-->
+            <!--res:maxHeight="200dp" />-->
+
+    </RelativeLayout>
+
+</LinearLayout>

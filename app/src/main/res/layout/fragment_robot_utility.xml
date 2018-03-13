@@ -1,0 +1,113 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:background="#111111"
+    tools:context=".fragment.RobotUtilityFragment">
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/map_layout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="5dp">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/load_map_btn"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Load Map"/>-->
+
+        <!--<Button-->
+            <!--android:id="@+id/save_map_btn"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Save Map"/>-->
+
+    <!--</LinearLayout>-->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/AppTheme.Label.Title"
+        android:text="Map Load Information"
+        android:textColor="#FFFFFF"
+        android:typeface="sans"/>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:rowCount="1"
+        android:columnCount="2">
+
+        <TextView
+            style="@style/AppTheme.SmallTextView"
+            android:text="Data Path:"
+            android:textColor="#FFFFFF"
+            android:typeface="sans"/>
+
+        <TextView
+            style="@style/AppTheme.SmallTextView"
+            android:id="@+id/record_data_path_text"
+            android:layout_gravity="fill_horizontal"
+            android:typeface="sans"
+            android:textColor="#FFFFFF"
+            android:layout_width="0dp"/>
+
+        <TextView
+            style="@style/AppTheme.SmallTextView"
+            android:text="Duration:"
+            android:textColor="#FFFFFF"
+            android:typeface="sans"/>
+
+        <TextView
+            style="@style/AppTheme.SmallTextView"
+            android:id="@+id/record_duration_text"
+            android:layout_gravity="fill_horizontal"
+            android:typeface="sans"
+            android:textColor="#FFFFFF"
+            android:layout_width="0dp"/>
+
+    </GridLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/AppTheme.Label.Title"
+        android:text="Debug Information"
+        android:typeface="sans"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        style="@style/AppTheme.SmallTextView"
+        android:typeface="sans"
+        android:textColor="#FFFFFF"
+        android:id="@+id/http_server_address_label"/>
+
+    <TextView
+        style="@style/AppTheme.SmallTextView"
+        android:typeface="sans"
+        android:textColor="#FFFFFF"
+        android:id="@+id/sdk_version_label"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/AppTheme.Label.Title"
+        android:text="Install Help"
+        android:textColor="#FFFFFF"
+        android:typeface="sans"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        style="@style/AppTheme.SmallTextView"
+        android:textColor="#FFFFFF"
+        android:text="@string/help_msg"
+        android:typeface="sans"/>
+
+</LinearLayout>

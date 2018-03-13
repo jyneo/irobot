@@ -1,0 +1,69 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context=".fragment.RobotControlFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/irobot_reset"
+                android:layout_weight="1"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:text="Reset" />
+
+            <Button
+                android:id="@+id/irobot_start"
+                android:layout_weight="1"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:text="Start" />
+
+            <Button
+                android:id="@+id/irobot_stop"
+                android:layout_weight="1"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:text="Stop" />
+
+            <Button
+                android:id="@+id/irobot_safe_mode"
+                android:layout_weight="1"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:text="Safe" />
+
+            <Button
+                android:id="@+id/irobot_full_mode"
+                android:layout_weight="1"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:text="Full" />
+
+        </LinearLayout>
+
+        <ToggleButton
+            android:id="@+id/record_toggle_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textOn="Stop Recording"
+            android:textOff="Start Recording"/>
+
+    </LinearLayout>
+
+    <com.arcsoft.irobot.view.RobotJoyStick
+        android:layout_width="match_parent"
+        android:layout_height="165dp"
+        android:id="@+id/rocker_view"/>
+
+</LinearLayout>
