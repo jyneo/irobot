@@ -1,10 +1,8 @@
 package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +11,6 @@ import android.widget.Button;
 
 import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.SensorDataPackage.Create2;
-import com.arcsoft.irobot.interfaces.IRobot;
 import com.arcsoft.irobot.view.RobotJoyStick;
 
 /**
@@ -26,10 +23,7 @@ public class RobotControlFragment extends Fragment {
     private static final boolean DEBUG = true;  // TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
 
-    private IRobot mIRobot;
     private Create2 create2;
-//    private ToggleButton mRecordButton;
-    private LocalBroadcastManager localBroadcastManager;
 
     public RobotControlFragment() {
         // Required empty public constructor
@@ -37,13 +31,7 @@ public class RobotControlFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        //if (DEBUG) Log.d(TAG, "onAttach");
         super.onAttach(context);
-        if (context instanceof IRobot) {
-            mIRobot = (IRobot) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement IRobot");
-        }
     }
 
     @Override
@@ -54,17 +42,31 @@ public class RobotControlFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //if (DEBUG) Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
         RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
         mRobotJoyStick.setCallback(new RobotJoyStick.RockerCallBack() {
             @Override
-            public void setVelocityLR(int left, int right) {
-                Intent intent = new Intent("com.arcsoft.irobot.setVelocity");
-                intent.putExtra("left", left);
-                intent.putExtra("right", right);
-                localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
-                localBroadcastManager.sendBroadcast(intent);
+            public void setVelocityLR(final int left, final int right) {
+                if (create2 != null && create2.isConnecting()) {
+                    Log.d(TAG, "setVelocityLR: " + left + " " + right);
+//                    new Thread() {
+//                        @Override
+//                        public void run() {
+//                            try{
+//                                Thread.sleep(200);
+//                                create2.driveWheels(left, right);
+//                            }catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }.start();
+                    try{
+                        Thread.sleep(100);
+                        create2.driveWheels(left, right);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
         });
         return view;
@@ -73,7 +75,7 @@ public class RobotControlFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        create2 = new Create2(getContext());
+        create2 = new Create2();
 
         Button stop_button = getActivity().findViewById(R.id.irobot_reset);
         stop_button.setOnClickListener(new View.OnClickListener() {
@@ -142,21 +144,15 @@ public class RobotControlFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (DEBUG) Log.v(TAG, "onResume");
-        // Update status when navigating back
-//        ((MainActivity) getActivity()).addRobotListener(mRobotListener);
     }
 
     @Override
     public void onPause() {
-        //if (DEBUG) Log.v(TAG, "onPause");
-//        ((MainActivity) getActivity()).removeRobotListener(mRobotListener);
         super.onPause();
     }
 
     @Override
     public void onDetach() {
-        //if (DEBUG) Log.d(TAG, "onDetach");
         super.onDetach();
     }
 

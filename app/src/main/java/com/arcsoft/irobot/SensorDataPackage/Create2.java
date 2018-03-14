@@ -1,6 +1,5 @@
 package com.arcsoft.irobot.SensorDataPackage;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,15 +27,13 @@ public class Create2 {
     private static InputStream inputStream;
     private static OutputStream outputStream;
 
-    private Context mContext;
     private static StreamCallback mStreamCallback;
 
     public interface StreamCallback {
         void onStream(final float[] results);
     }
 
-    public Create2(Context context){
-        this.mContext = context;
+    public Create2(){
     }
 
     public synchronized boolean connect(){
@@ -45,8 +42,8 @@ public class Create2 {
             mConnecting = true;
             if (socket == null) {
                 // 用InetAddress方法获取ip地址
-                String IP = "192.168.123.1";
-//                String IP = "192.168.100.1";
+//                String IP = "192.168.123.1";
+                String IP = "192.168.100.1";
                 String PORT = "8888";
                 InetAddress ipAddress = InetAddress.getByName(IP);
                 int port = Integer.valueOf(PORT); // 获取端口号
@@ -98,7 +95,6 @@ public class Create2 {
         }
         Log.d(TAG, "disconnect: " + mConnecting);
         mConnecting = false;
-        Log.d(TAG, "disconnect: " + mConnecting);
     }
 
     public void stream(StreamCallback callback){
@@ -109,34 +105,7 @@ public class Create2 {
         return mConnecting;
     }
 
-    // 连接线程
-    class Connect_Thread extends Thread {
-        public void run() {
-            try {
-                if (socket == null) {
-                    // 用InetAddress方法获取ip地址
-                    String IP = "192.168.123.1";
-//                    String IP = "192.168.100.1";
-                    String PORT = "8888";
-                    InetAddress ipAddress = InetAddress.getByName(IP);
-                    int port = Integer.valueOf(PORT); // 获取端口号
-                    Log.d(TAG, "run: " + ipAddress + "  " + port);
-                    socket = new Socket(ipAddress, port); // 创建连接地址和端口
-//                    outputStream = socket.getOutputStream();
-                    Log.d(TAG, "run: " + socket + "   " + outputStream);
-
-                    // 在创建完连接后启动接收线程
-                    Receive_Thread receive_Thread = new Receive_Thread();
-                    receive_Thread.start();
-                }
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public static float byte2float(byte[] b, int index) {
+    private static float byte2float(byte[] b, int index) {
         int l;
         l = b[index];
         l &= 0xff;
@@ -155,19 +124,16 @@ public class Create2 {
                 try {
                     byte[] buffer = new byte[1024]; // 创建接收缓冲区
                     float[] Matrix_4x4 = new float[16]; // 创建接收缓冲区
-                    inputStream = socket.getInputStream();
                     int length = inputStream.read(buffer); // 数据读出来，并且返回数据的长度
 
+                    Log.d(TAG, "run: " + length);
                     if (length > 0) { // 如果数据不为空，每16个读成一个 4*4 矩阵
 
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
 
-                        Log.d(TAG, "receive: " + length + "   ");
                         for (int i = 0; i < 16; i++) {
                             Matrix_4x4[i] = byte2float(buffer, 4 * i);
                         }
-
-                        Log.d(TAG, "run: " + mStreamCallback);
 
                         if (mStreamCallback != null && isConnecting()) {
                             Message message = handler.obtainMessage();
@@ -178,9 +144,9 @@ public class Create2 {
                             message.sendToTarget();
                         }
 
-                        for (int i = 0; i < 4; i++) {
-                            Log.d(TAG, Matrix_4x4[i] + " " + Matrix_4x4[4 + i] + " " + Matrix_4x4[8 + i] + " " + Matrix_4x4[12 + i]);
-                        }
+//                        for (int i = 0; i < 4; i++) {
+//                            Log.d(TAG, Matrix_4x4[i] + " " + Matrix_4x4[4 + i] + " " + Matrix_4x4[8 + i] + " " + Matrix_4x4[12 + i]);
+//                        }
                     }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
@@ -210,12 +176,9 @@ public class Create2 {
         try {
             synchronized (mStreamSync) {
                 Log.d(TAG, "write: " + socket + "   " + outputStream);
-//                Log.d(TAG, "write: " + StringUtils.bytesToHex(data));
-//                Log.d(TAG, "write: " + data[0] + " " + data[1] + " " + data[2] + " " + data[3] + " " + data[4]);
                 Log.d(TAG, "write: " + data[0]);
                 outputStream.write(data);
                 outputStream.flush();
-                //mOutStream.flush(); deadlock sometime when enabled
             }
             return true;
         } catch (IOException e) {
@@ -226,7 +189,6 @@ public class Create2 {
 
     public boolean driveWheels(int leftVelocity, int rightVelocity) {
         return send(SensorCommand.kDriveWheels, rightVelocity, leftVelocity);
-//        return send(SensorCommand.kDriveWheels, -200, 500);
     }
 
     public boolean reset() {
@@ -238,13 +200,14 @@ public class Create2 {
     }
 
     public boolean stop() {
-        return write(new byte[] {
-                (byte) ( 137 & 0xFF),
-                (byte) 0,
-                (byte) 0,
-                (byte) 0,
-                (byte) 0,
-        });
+        return send(SensorCommand.kStop);
+//        return write(new byte[] {
+//                (byte) ( 137 & 0xFF),
+//                (byte) 0,
+//                (byte) 0,
+//                (byte) 0,
+//                (byte) 0,
+//        });
     }
 
     public boolean safe() {

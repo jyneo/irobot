@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -27,12 +28,15 @@ import java.util.List;
 
 public class GridMapView extends View {
 
+    private static int count = 0;
     private Paint mPaint;
+
+    private int mTotalWidth;
+    private int mTotalHeight;
 
     private float mOrientation = 0;
     private Paint mStrokePaint; // 箭头圆环
     private Path mArrowPath; // 箭头路径
-    Path mPath;
 
     private int cR = 10; // 圆点半径
     private int arrowR = 20; // 箭头半径
@@ -79,7 +83,6 @@ public class GridMapView extends View {
     private void initArrowPath() {
         Log.d("GridMapView", "initArrowPath: ");
 
-        mPath = new Path();
         // 初始化箭头路径
         mArrowPath = new Path();
         mArrowPath.arcTo(new RectF(-arrowR, -arrowR, arrowR, arrowR), 0, -180);
@@ -90,12 +93,19 @@ public class GridMapView extends View {
         mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
         Log.d("GridMapView", "initArrowPath: " + mBitmap);
         mSrcRect = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+        Log.d("0000000", "initArrowPath: " + mBitmap.getWidth() + " " + getWidth());
+        // 计算左边位置
+//        int left = mTotalWidth / 2 - mBitmap.getWidth() / 2;
+        // 计算上边位置
+//        int top = mTotalHeight / 2 - mBitmap.getHeight() / 2;
+//        mDstRect = new Rect(left, top, mBitmap.getWidth() + left, mBitmap.getHeight() + top);
         mDstRect = new Rect(0, 0, getWidth(), getHeight());
         mArrowRect = new RectF(-arrowR * 0.8f, -arrowR * 0.8f, arrowR * 0.8f, arrowR * 0.8f);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
         if (canvas == null || mBitmap == null)
             return;
         Log.d("GridMapView", "onDraw: " + mBitmap);
@@ -105,9 +115,25 @@ public class GridMapView extends View {
         for (PointF pointF : mPointList) {
             canvas.drawCircle(pointF.x, pointF.y, cR, mPaint);
 
-            mPath.moveTo(mCurX, mCurY);
-            mPath.lineTo(pointF.x, pointF.y);
-            canvas.drawPath(mPath, mPaint);
+            canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
+
+            mCurX = pointF.x;
+            mCurY = pointF.y;
+
+            // 连线
+//            if (count == 0){
+//                mCurX = mPointList.get(0).x;
+//                mCurY = mPointList.get(0).y;
+//                Log.d("11111111111", "onDraw: " + mCurX + " " + mCurY);
+//            } else {
+//                Log.d("22222222222", "onDraw: " + mCurX + " " + mCurY + " " + pointF.x + " " + pointF.y);
+//                canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
+//
+//                mCurX = pointF.x;
+//                mCurY = pointF.y;
+//                Log.d("33333333333", "onDraw: " + count);
+//            }
+//            count++;
         }
 
         // 画箭头
@@ -118,26 +144,42 @@ public class GridMapView extends View {
         canvas.drawArc(mArrowRect, 0, 360, false, mStrokePaint);
         canvas.restore(); // 恢复画布
 
-        super.onDraw(canvas);
     }
 
-    public void setGridMap(PointF pointF, float orientation) {
-//        mDestinationPosition = pointF;
+    public void setGridMap(Point pointF, int orientation) {
         if (orientation < 0)
             orientation = orientation + 360;
         mOrientation = orientation;
-        mCurX = pointF.x;
-        mCurY = pointF.y;
-        mPointList.add(new PointF(mCurX, mCurY));
-        Log.d("GridMapView", "setGridMap: " + mCurX + " " + mCurY + " " + mOrientation);
-//        mPath.moveTo(mCurrentPosition.x, mCurrentPosition.y);
-//
-//        连线
-//        mPath.quadTo(mCurrentPosition.x, mCurrentPosition.y, mDestinationPosition.x, mDestinationPosition.y);
-//        mCurrentPosition = mDestinationPosition;
+
+        if (!mPointList.isEmpty()){
+            mCurX = mPointList.get(0).x;
+            mCurY = mPointList.get(0).y;
+        }
+
+        Log.d("GridMapView", "setGridMap: " + pointF.x + " " + pointF.y + " " + mOrientation);
+        mPointList.add(new PointF(pointF.x + getWidth() / 2, pointF.y + getHeight() / 2));
 
         //刷新view
         invalidate();
+    }
+
+    public void clearGridMap(){
+        mBitmap = null;
+        mPointList = null;
+        mArrowPath = null;
+        mOrientation = 0;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mTotalWidth = w;
+        mTotalHeight = h;
     }
 
 }

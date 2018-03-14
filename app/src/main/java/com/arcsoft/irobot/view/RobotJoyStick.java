@@ -114,7 +114,7 @@ public class RobotJoyStick extends View {
                 float angle = (float) Math.atan2(dy, dx);
                 float length = (float) Math.sqrt(dx*dx + dy*dy);
 
-                int mMaxVelocity = 100;
+                int mMaxVelocity = 200;
                 float velocity = mMaxVelocity * Math.min(1.0f, (length - r * 0.3f) / (r - r * 0.3f));
                 setVelocity(angle, (int) velocity);
 

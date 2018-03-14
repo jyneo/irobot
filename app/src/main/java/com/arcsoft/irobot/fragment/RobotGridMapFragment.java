@@ -1,7 +1,7 @@
 package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
-import android.graphics.PointF;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,7 +14,7 @@ import com.arcsoft.irobot.SensorDataPackage.Create2;
 import com.arcsoft.irobot.object.GridMap;
 import com.arcsoft.irobot.view.GridMapView;
 
-import java.util.Random;
+import java.util.Timer;
 
 /**
  *
@@ -25,6 +25,7 @@ public class RobotGridMapFragment extends Fragment{
 
     private GridMapView mMapView;
     Create2 create2;
+    Timer mMapViewUpdateTimer;
     private final GridMap mMap = new GridMap();
 
     public RobotGridMapFragment() {
@@ -54,7 +55,7 @@ public class RobotGridMapFragment extends Fragment{
     public void onResume() {
         super.onResume();
 
-        create2 = new Create2(getContext());
+        create2 = new Create2();
         create2.stream(mStreamCallback);
     }
 
@@ -76,18 +77,18 @@ public class RobotGridMapFragment extends Fragment{
             }
 
             Log.d("RobotGridMapFragment", "onStream: " + result[12] + " " + result[13]);
-            PointF position = new PointF(0,0);
-//            position.x = result[12];
-//            position.y = result[13];
+            Point position = new Point(0,0);
+            position.x = (int) result[12];
+            position.y = (int) result[13];
 
-//            double orientation = Math.acos(result[0]);
-//            mMapView.setGridMap(position, (float) orientation);
-            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
-            Random random = new Random();
-            position.x = random.nextInt(1000);
-            position.y = random.nextInt(1000);
-            float orientation = random.nextInt(360);
+            int orientation = (int) Math.acos(result[0]);
             mMapView.setGridMap(position, orientation);
+            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
+//            Random random = new Random();
+//            position.x = random.nextInt(1000) - 500;
+//            position.y = random.nextInt(1000) - 500;
+//            float orientation = random.nextInt(360);
+//            mMapView.setGridMap(position, orientation);
         }
     };
 
