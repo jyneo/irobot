@@ -42,8 +42,8 @@ public class Create2 {
             mConnecting = true;
             if (socket == null) {
                 // 用InetAddress方法获取ip地址
-//                String IP = "192.168.123.1";
-                String IP = "192.168.100.1";
+                String IP = "192.168.123.1";
+//                String IP = "192.168.100.1";
                 String PORT = "8888";
                 InetAddress ipAddress = InetAddress.getByName(IP);
                 int port = Integer.valueOf(PORT); // 获取端口号

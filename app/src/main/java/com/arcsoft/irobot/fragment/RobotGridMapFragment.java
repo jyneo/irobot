@@ -14,6 +14,7 @@ import com.arcsoft.irobot.SensorDataPackage.Create2;
 import com.arcsoft.irobot.object.GridMap;
 import com.arcsoft.irobot.view.GridMapView;
 
+import java.util.Random;
 import java.util.Timer;
 
 /**
@@ -78,17 +79,17 @@ public class RobotGridMapFragment extends Fragment{
 
             Log.d("RobotGridMapFragment", "onStream: " + result[12] + " " + result[13]);
             Point position = new Point(0,0);
-            position.x = (int) result[12];
-            position.y = (int) result[13];
-
-            int orientation = (int) Math.acos(result[0]);
-            mMapView.setGridMap(position, orientation);
-            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
-//            Random random = new Random();
-//            position.x = random.nextInt(1000) - 500;
-//            position.y = random.nextInt(1000) - 500;
-//            float orientation = random.nextInt(360);
+//            position.x = (int) result[12];
+//            position.y = (int) result[13];
+//
+//            int orientation = (int) Math.acos(result[0]);
 //            mMapView.setGridMap(position, orientation);
+            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
+            Random random = new Random();
+            position.x = random.nextInt(1000) - 500;
+            position.y = random.nextInt(1000) - 500;
+            int orientation = random.nextInt(360);
+            mMapView.setGridMap(position, orientation);
         }
     };
 

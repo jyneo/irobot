@@ -2,6 +2,7 @@ package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,8 +23,10 @@ public class RobotControlFragment extends Fragment {
 
     private static final boolean DEBUG = true;  // TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
+    private static final int MSG_UPDATE_GRID_VIEW = 0;
 
     private Create2 create2;
+    Handler mHandler;
 
     public RobotControlFragment() {
         // Required empty public constructor
@@ -44,33 +47,60 @@ public class RobotControlFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
         RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
+
+        mHandler = new Handler();
         mRobotJoyStick.setCallback(new RobotJoyStick.RockerCallBack() {
             @Override
             public void setVelocityLR(final int left, final int right) {
                 if (create2 != null && create2.isConnecting()) {
                     Log.d(TAG, "setVelocityLR: " + left + " " + right);
-//                    new Thread() {
+
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            create2.driveWheels(left, right);
+                        }
+                    }, 100);
+
+//                    mMapViewUpdateTimer = new Timer();
+//                    mMapViewUpdateTimer.schedule(new TimerTask() {
 //                        @Override
 //                        public void run() {
-//                            try{
-//                                Thread.sleep(200);
-//                                create2.driveWheels(left, right);
-//                            }catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
+////                            Message message = mHandler.obtainMessage();
+////                            message.what = MSG_UPDATE_GRID_VIEW;
+////                            Bundle bundle = new Bundle();
+////                            bundle.putInt("left", left);
+////                            bundle.putInt("right", right);
+////                            message.setData(bundle);
+////                            message.sendToTarget();
+////                            mHandler.sendEmptyMessage(MSG_UPDATE_GRID_VIEW);
 //                        }
-//                    }.start();
-                    try{
-                        Thread.sleep(100);
-                        create2.driveWheels(left, right);
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
+//                    }, 0, 100);
+//                    try{
+//                        Thread.sleep(100);
+//                        create2.driveWheels(left, right);
+//                    } catch (Exception e){
+//                        e.printStackTrace();
+//                    }
                 }
             }
         });
         return view;
     }
+
+//    private Timer mMapViewUpdateTimer;
+//    private final Handler mHandler = new Handler(new Handler.Callback() {
+//        @Override
+//        public boolean handleMessage(Message message) {
+//            switch (message.what){
+//                case MSG_UPDATE_GRID_VIEW:
+//                    Bundle bundle = message.getData();
+//                    create2.driveWheels(bundle.getInt("left"),bundle.getInt("right"));
+//                    break;
+//            }
+//            return false;
+//        }
+//    });
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
