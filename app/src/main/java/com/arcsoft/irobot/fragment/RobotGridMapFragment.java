@@ -84,7 +84,7 @@ public class RobotGridMapFragment extends Fragment{
 //
 //            int orientation = (int) Math.acos(result[0]);
 //            mMapView.setGridMap(position, orientation);
-            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
+//            Log.d("RobotGridMapFragment", "onStream: " + "callback success");
             Random random = new Random();
             position.x = random.nextInt(1000) - 500;
             position.y = random.nextInt(1000) - 500;
