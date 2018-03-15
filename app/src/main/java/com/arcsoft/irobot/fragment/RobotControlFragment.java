@@ -23,10 +23,8 @@ public class RobotControlFragment extends Fragment {
 
     private static final boolean DEBUG = true;  // TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
-    private static final int MSG_UPDATE_GRID_VIEW = 0;
 
     private Create2 create2;
-    Handler mHandler;
 
     public RobotControlFragment() {
         // Required empty public constructor
@@ -48,7 +46,6 @@ public class RobotControlFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
         RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
 
-//        mHandler = new Handler();
         mRobotJoyStick.setCallback(new RobotJoyStick.RockerCallBack() {
             @Override
             public void setVelocityLR(final int left, final int right) {

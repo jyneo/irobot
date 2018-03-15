@@ -163,13 +163,6 @@ public class GridMapView extends View {
         invalidate();
     }
 
-    public void clearGridMap(){
-        mBitmap = null;
-        mPointList = null;
-        mArrowPath = null;
-        mOrientation = 0;
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

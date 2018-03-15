@@ -201,13 +201,6 @@ public class Create2 {
 
     public boolean stop() {
         return send(SensorCommand.kStop);
-//        return write(new byte[] {
-//                (byte) ( 137 & 0xFF),
-//                (byte) 0,
-//                (byte) 0,
-//                (byte) 0,
-//                (byte) 0,
-//        });
     }
 
     public boolean safe() {
