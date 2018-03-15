@@ -48,59 +48,24 @@ public class RobotControlFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
         RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
 
-        mHandler = new Handler();
+//        mHandler = new Handler();
         mRobotJoyStick.setCallback(new RobotJoyStick.RockerCallBack() {
             @Override
             public void setVelocityLR(final int left, final int right) {
                 if (create2 != null && create2.isConnecting()) {
                     Log.d(TAG, "setVelocityLR: " + left + " " + right);
 
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            create2.driveWheels(left, right);
-                        }
-                    }, 100);
-
-//                    mMapViewUpdateTimer = new Timer();
-//                    mMapViewUpdateTimer.schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-////                            Message message = mHandler.obtainMessage();
-////                            message.what = MSG_UPDATE_GRID_VIEW;
-////                            Bundle bundle = new Bundle();
-////                            bundle.putInt("left", left);
-////                            bundle.putInt("right", right);
-////                            message.setData(bundle);
-////                            message.sendToTarget();
-////                            mHandler.sendEmptyMessage(MSG_UPDATE_GRID_VIEW);
-//                        }
-//                    }, 0, 100);
-//                    try{
-//                        Thread.sleep(100);
-//                        create2.driveWheels(left, right);
-//                    } catch (Exception e){
-//                        e.printStackTrace();
-//                    }
+                    try{
+                        Thread.sleep(20);
+                        create2.driveWheels(left, right);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             }
         });
         return view;
     }
-
-//    private Timer mMapViewUpdateTimer;
-//    private final Handler mHandler = new Handler(new Handler.Callback() {
-//        @Override
-//        public boolean handleMessage(Message message) {
-//            switch (message.what){
-//                case MSG_UPDATE_GRID_VIEW:
-//                    Bundle bundle = message.getData();
-//                    create2.driveWheels(bundle.getInt("left"),bundle.getInt("right"));
-//                    break;
-//            }
-//            return false;
-//        }
-//    });
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
