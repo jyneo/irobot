@@ -129,7 +129,7 @@ public class Create2 {
                     Log.d(TAG, "run: " + length);
                     if (length > 0) { // 如果数据不为空，每16个读成一个 4*4 矩阵
 
-                        Thread.sleep(1000);
+                        Thread.sleep(30);
 
                         for (int i = 0; i < 16; i++) {
                             Matrix_4x4[i] = byte2float(buffer, 4 * i);
