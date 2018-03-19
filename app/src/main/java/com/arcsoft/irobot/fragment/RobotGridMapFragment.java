@@ -75,8 +75,9 @@ public class RobotGridMapFragment extends Fragment{
 
             Log.d("RobotGridMapFragment", "onStream: " + result[12] + " " + result[13]);
             Point position = new Point(0,0);
-//            position.x = (int) result[12];
-//            position.y = (int) result[13];
+            // todo: 坐标转换
+//            position.x = (int) (result[12] * 1000);
+//            position.y = (int) (result[13] * 1000);
 //
 //            int orientation = (int) Math.acos(result[0]);
 //            mMapView.setGridMap(position, orientation);

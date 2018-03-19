@@ -21,6 +21,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.ashokvarma.android:bottom-navigation-bar:1.4.1'
+    implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
 }

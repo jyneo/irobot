@@ -45,6 +45,8 @@ public class RobotControlFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
         RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
 
+        create2 = new Create2();
+
         mRobotJoyStick.setCallback(new RobotJoyStick.RockerCallBack() {
             @Override
             public void setVelocityLR(final int left, final int right) {
@@ -66,7 +68,6 @@ public class RobotControlFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
-        create2 = new Create2();
 
         Button stop_button = getActivity().findViewById(R.id.irobot_reset);
         stop_button.setOnClickListener(new View.OnClickListener() {

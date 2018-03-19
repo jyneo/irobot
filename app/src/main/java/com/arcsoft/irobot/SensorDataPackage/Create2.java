@@ -143,10 +143,6 @@ public class Create2 {
                             message.setData(bundle);
                             message.sendToTarget();
                         }
-
-//                        for (int i = 0; i < 4; i++) {
-//                            Log.d(TAG, Matrix_4x4[i] + " " + Matrix_4x4[4 + i] + " " + Matrix_4x4[8 + i] + " " + Matrix_4x4[12 + i]);
-//                        }
                     }
                 } catch (Exception e) {
                     // TODO Auto-generated catch block

@@ -11,11 +11,11 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.nineoldandroids.view.ViewHelper;
 
-public class ScaleLayoutView extends FrameLayout {
+public class ScaleLayoutView extends LinearLayout {
     // 屏幕宽高
     private int screenHeight;
     private int screenWidth;
@@ -72,14 +72,14 @@ public class ScaleLayoutView extends FrameLayout {
                 case MotionEvent.ACTION_MOVE:
 
                     break;
-                case MotionEvent.ACTION_POINTER_2_UP: //第二个手指抬起的时候
+                case MotionEvent.ACTION_POINTER_2_UP: // 第二个手指抬起的时候
                     needToHandle = true;
                     break;
 
                 default:
                     break;
             }
-            return mScaleGestureDetector.onTouchEvent(event); //让mScaleGestureDetector处理触摸事件
+            return mScaleGestureDetector.onTouchEvent(event); // 让mScaleGestureDetector处理触摸事件
         } else {
             long currentTimeMillis = System.currentTimeMillis();
             if (currentTimeMillis - lastMultiTouchTime > 200 && needToHandle) {

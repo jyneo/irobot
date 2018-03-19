@@ -1,4 +1,4 @@
-<com.arcsoft.irobot.view.ScaleLayoutView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -6,11 +6,11 @@
     android:background="@color/gray"
     android:orientation="vertical">
 
-    <LinearLayout
+    <com.arcsoft.irobot.view.ScaleLayoutView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/gray"
+        android:orientation="vertical"
         tools:context=".fragment.RobotGridMapFragment">
 
         <com.arcsoft.irobot.view.GridMapView
@@ -20,6 +20,6 @@
             android:layout_height="0dp"
             android:background="#111111" />
 
-    </LinearLayout>
+    </com.arcsoft.irobot.view.ScaleLayoutView>
 
-</com.arcsoft.irobot.view.ScaleLayoutView>
+</LinearLayout>

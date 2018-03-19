@@ -28,7 +28,6 @@ import java.util.List;
 
 public class GridMapView extends View {
 
-    private static int count = 0;
     private Paint mPaint;
 
 //    private ScaleGestureDetector mScaleGestureDetector = null;
