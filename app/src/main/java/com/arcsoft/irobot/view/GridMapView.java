@@ -31,8 +31,7 @@ public class GridMapView extends View {
     private static int count = 0;
     private Paint mPaint;
 
-    private int mTotalWidth;
-    private int mTotalHeight;
+//    private ScaleGestureDetector mScaleGestureDetector = null;
 
     private float mOrientation = 0;
     private Paint mStrokePaint; // 箭头圆环
@@ -63,6 +62,7 @@ public class GridMapView extends View {
         super(context, attrs, defStyleAttr);
         initPaint();     // 初始化画笔
         initArrowPath(); // 初始化箭头路径
+//        mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleGestureListener());
     }
 
     private void initPaint() {
@@ -120,20 +120,6 @@ public class GridMapView extends View {
             mCurX = pointF.x;
             mCurY = pointF.y;
 
-            // 连线
-//            if (count == 0){
-//                mCurX = mPointList.get(0).x;
-//                mCurY = mPointList.get(0).y;
-//                Log.d("11111111111", "onDraw: " + mCurX + " " + mCurY);
-//            } else {
-//                Log.d("22222222222", "onDraw: " + mCurX + " " + mCurY + " " + pointF.x + " " + pointF.y);
-//                canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
-//
-//                mCurX = pointF.x;
-//                mCurY = pointF.y;
-//                Log.d("33333333333", "onDraw: " + count);
-//            }
-//            count++;
         }
 
         // 画箭头
@@ -171,8 +157,52 @@ public class GridMapView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mTotalWidth = w;
-        mTotalHeight = h;
     }
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        // 返回给ScaleGestureDetector来处理
+//        return mScaleGestureDetector.onTouchEvent(event);
+//    }
+//
+//    public class ScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
+//
+//        private float scale;
+//        private float preScale = 1; // 默认前一次缩放比例为1
+//        GridMapView gridMapView = getRootView().findViewById(R.id.grid_map_view);
+//
+//        @Override
+//        public boolean onScale(ScaleGestureDetector detector) {
+//
+//            float previousSpan = detector.getPreviousSpan();
+//            float currentSpan = detector.getCurrentSpan();
+//            if (currentSpan < previousSpan) {
+//                // 缩小
+//                // scale = preScale-detector.getScaleFactor()/3;
+//                scale = preScale - (previousSpan - currentSpan) / 1000;
+//            } else {
+//                // 放大
+//                // scale = preScale+detector.getScaleFactor()/3;
+//                scale = preScale + (currentSpan - previousSpan) / 1000;
+//            }
+//
+//            // 缩放view
+//            ViewHelper.setScaleX(gridMapView, scale ); // x方向上缩小
+//            ViewHelper.setScaleY(gridMapView, scale ); // y方向上缩小
+//
+//            return false;
+//        }
+//
+//        @Override
+//        public boolean onScaleBegin(ScaleGestureDetector detector) {
+//            // 一定要返回true才会进入onScale()这个函数
+//            return true;
+//        }
+//
+//        @Override
+//        public void onScaleEnd(ScaleGestureDetector detector) {
+//            preScale = scale; //记录本次缩放比例
+//        }
+//    }
 
 }

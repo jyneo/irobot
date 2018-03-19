@@ -11,11 +11,9 @@ import android.view.ViewGroup;
 
 import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.SensorDataPackage.Create2;
-import com.arcsoft.irobot.object.GridMap;
 import com.arcsoft.irobot.view.GridMapView;
 
 import java.util.Random;
-import java.util.Timer;
 
 /**
  *
@@ -26,8 +24,6 @@ public class RobotGridMapFragment extends Fragment{
 
     private GridMapView mMapView;
     Create2 create2;
-    Timer mMapViewUpdateTimer;
-    private final GridMap mMap = new GridMap();
 
     public RobotGridMapFragment() {
         // Required empty public constructor
