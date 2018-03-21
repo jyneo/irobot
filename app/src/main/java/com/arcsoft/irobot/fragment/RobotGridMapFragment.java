@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.SensorDataPackage.Create2;
@@ -45,14 +46,49 @@ public class RobotGridMapFragment extends Fragment{
         View rootView = inflater.inflate(R.layout.fragment_robot_gridmap, container, false);
         mMapView = rootView.findViewById(R.id.grid_map_view);
 
+        create2 = new Create2();
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState){
+        super.onActivityCreated(savedInstanceState);
+
+        Button modeZ_button = getActivity().findViewById(R.id.modeZ);
+        modeZ_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (create2.isConnecting()) {
+                    create2.mode(1);
+                }
+            }
+        });
+
+        Button modeG_button = getActivity().findViewById(R.id.modeG);
+        modeG_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (create2.isConnecting()) {
+                    create2.mode(2);
+                }
+            }
+        });
+
+        Button cancel_button = getActivity().findViewById(R.id.modeCancel);
+        cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (create2.isConnecting()) {
+                    create2.mode(3);
+                }
+             }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        create2 = new Create2();
         create2.stream(mStreamCallback);
     }
 

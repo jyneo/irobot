@@ -168,21 +168,6 @@ public class Create2 {
         }
     });
 
-    public boolean write(byte data[]) {
-        try {
-            synchronized (mStreamSync) {
-                Log.d(TAG, "write: " + socket + "   " + outputStream);
-                Log.d(TAG, "write: " + data[0]);
-                outputStream.write(data);
-                outputStream.flush();
-            }
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean driveWheels(int leftVelocity, int rightVelocity) {
         return send(SensorCommand.kDriveWheels, rightVelocity, leftVelocity);
     }
@@ -207,13 +192,17 @@ public class Create2 {
         return send(SensorCommand.kFull);
     }
 
+    public boolean mode(int opcode) {
+        return send(opcode);
+    }
+
     private boolean send(int opcode) {
         return write(new byte[] { (byte) (opcode & 0xFF) });
     }
 
     private boolean send(int opcode, byte data) {
         return write(new byte[] {
-                (byte) opcode,
+                (byte) (opcode & 0xFF),
                 data,
         });
     }
@@ -227,4 +216,20 @@ public class Create2 {
                 (byte) ((data1) & 0xFF),
         });
     }
+
+    public boolean write(byte data[]) {
+        try {
+            synchronized (mStreamSync) {
+                Log.d(TAG, "write: " + socket + "   " + outputStream);
+                Log.d(TAG, "write: " + data[0]);
+                outputStream.write(data);
+                outputStream.flush();
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
