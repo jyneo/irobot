@@ -1,24 +1,24 @@
 package com.arcsoft.irobot.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.adapter.MainAdapter;
-import com.arcsoft.irobot.fragment.RobotGridMapFragment;
+import com.arcsoft.irobot.fragment.RobotMappingFragment;
+import com.arcsoft.irobot.fragment.RobotTrajectoryFragment;
 import com.arcsoft.irobot.fragment.RobotStatusFragment;
 import com.arcsoft.irobot.fragment.RobotSystemFragment;
 import com.arcsoft.irobot.fragment.RobotUtilityFragment;
-import com.arcsoft.irobot.interfaces.IRobot;
 import com.arcsoft.irobot.utils.CustomViewPager;
 import com.ashokvarma.bottomnavigation.BottomNavigationBar;
 import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener, ViewPager.OnPageChangeListener, IRobot {
+public class MainActivity extends AppCompatActivity implements BottomNavigationBar.OnTabSelectedListener, ViewPager.OnPageChangeListener {
     private static final String TAG = "MainActivity";
     private CustomViewPager viewPager;
     private BottomNavigationBar bottomNavigationBar;
@@ -36,14 +36,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     private void initViewPager() {
         ArrayList<Fragment> mFragmentList = new ArrayList<>();
         mFragmentList.add(new RobotSystemFragment());
-        mFragmentList.add(new RobotGridMapFragment());
+        mFragmentList.add(new RobotTrajectoryFragment());
+        mFragmentList.add(new RobotMappingFragment());
         mFragmentList.add(new RobotStatusFragment());
         mFragmentList.add(new RobotUtilityFragment());
 
         viewPager = (CustomViewPager) findViewById(R.id.viewPager);
         viewPager.setScanScroll(false);
         viewPager.setOnPageChangeListener(this);
-        MainAdapter mainAdapter = new MainAdapter(getSupportFragmentManager(), mFragmentList);
+        // ViewPager的默认加载方式是缓存当前界面前后相邻的两个界面，即最多共缓存包括当前界面在内的三个界面信息。当滑动界面时，非相邻界面信息将被释放
+        viewPager.setOffscreenPageLimit(2); // 缓存当前界面每侧的界面数
+        MainAdapter mainAdapter = new MainAdapter(getFragmentManager(), mFragmentList);
         viewPager.setAdapter(mainAdapter); // 视图加载适配器
     }
 
@@ -92,11 +95,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
 
 
         bottomNavigationBar.addItem(new BottomNavigationItem(R.drawable.ic_action_joypad, "System").setActiveColorResource(R.color.orange))
-                .addItem(new BottomNavigationItem(R.drawable.ic_action_map, "Map").setActiveColorResource(R.color.green))
+                .addItem(new BottomNavigationItem(R.drawable.ic_action_map, "Trajectory").setActiveColorResource(R.color.green))
+                .addItem(new BottomNavigationItem(R.drawable.ic_action_map, "Mapping").setActiveColorResource(R.color.IndianRed))
                 .addItem(new BottomNavigationItem(R.drawable.ic_action_gear, "Status").setActiveColorResource(R.color.teal))
                 .addItem(new BottomNavigationItem(R.drawable.ic_action_android, "Utility").setActiveColorResource(R.color.red))
                 .setFirstSelectedPosition(0)
-                .initialise(); //所有的设置需在调用该方法前完成
+                .initialise(); // 所有的设置需在调用该方法前完成
 
         //如果使用颜色的变化不足以展示一个选项Item的选中与非选中状态，
         // 可以使用BottomNavigationItem.setInActiveIcon()方法来设置。
@@ -135,58 +139,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
     @Override
     public void onPageScrollStateChanged(int state) {
 
-    }
-
-    @Override
-    public boolean setWheelSpeed(int speedL, int speedR) {
-//        if (mLastControlTimestamp != -1 && mLastLeftSpeed == speedL && mLastRightSpeed == speedR) {
-//            return false;
-//        }
-//        //int speedDiff = Math.abs(speedL - mLastLeftSpeed) + Math.abs(speedR - mLastRightSpeed);
-//        if (mLastControlTimestamp == -1 ||
-//                System.currentTimeMillis() - mLastControlTimestamp > 80 || // 200, 100 is nearly ok
-//                speedL == 0 && speedR == 0) {
-//            if (DEBUG) Log.e(TAG, "feedback: setWheelSpeed: L=" + speedL + ", R=" + speedR);
-//            synchronized (mRobotSync) {
-//                if (mCreate2 != null && mCreate2.isValid()) {
-//                    boolean isOk = mCreate2.driveWheels(speedL, speedR);
-//                    if (isOk) {
-//                        mLastLeftSpeed = speedL;
-//                        mLastRightSpeed = speedR;
-//                        mLastControlTimestamp = System.currentTimeMillis();
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-        return false;
-    }
-
-    @Override
-    public boolean setWheelSpeed(int speedL, int speedR, boolean force) {
-//        if (force) {
-//            mLastControlTimestamp = -1;
-//        }
-        return setWheelSpeed(speedL, speedR);
-    }
-
-    private int mRequiredVelocity = 100;
-    @Override
-    public void setRequiredVelocity(final int velocity) {
-//        if (mRequiredVelocity != velocity) {
-//            mRequiredVelocity = velocity;
-//            if (mSLAM.isValid()) {
-//                if (!mSLAM.setProperty(ArcSoft3DTracking.AS3DT_PROP_MAX_WHEEL_VELOCITY, velocity)) {
-//                    displayToast("Fail to set max wheel velocity to " + velocity, true);
-//                }
-//            }
-//            resetWheelSpeedState();
-//        }
-    }
-
-    @Override
-    public int getRequiredVelocity() {
-        return mRequiredVelocity;
     }
 
 }

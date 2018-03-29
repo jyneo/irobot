@@ -1,11 +1,13 @@
 package com.arcsoft.irobot.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,9 @@ import android.view.ViewGroup;
 import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.SensorDataPackage.Create2;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.github.chrisbanes.photoview.PhotoViewAttacher;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  *
@@ -23,8 +28,10 @@ import com.github.chrisbanes.photoview.PhotoView;
 public class RobotMappingFragment extends Fragment {
 
     private static final String TAG = "RobotMappingFragment";
-    Create2 create2;
-    View rootView;
+    private Create2 create2;
+    private View rootView;
+    private PhotoView photoView;
+    private PhotoViewAttacher attacher;
 
     public RobotMappingFragment() {
         // Required empty public constructor
@@ -46,6 +53,8 @@ public class RobotMappingFragment extends Fragment {
 //        PhotoView photoView = rootView.findViewById(R.id.photo_view);
 //        Drawable bitmap = getResources().getDrawable(R.drawable.img_spalsh);
 //        photoView.setImageDrawable(bitmap);
+        photoView = (PhotoView) rootView.findViewById(R.id.photo_view);
+        attacher = new PhotoViewAttacher(photoView);
         create2 = new Create2();
 //        create2.mappingStream(mMappingStreamCallback);
 
@@ -96,42 +105,51 @@ public class RobotMappingFragment extends Fragment {
     public final Create2.MappingStreamCallback mMappingStreamCallback = new Create2.MappingStreamCallback() {
         @Override
         public void onMappingStream(byte[] results) {
-//            int width = 300;
-//            int height = 300;
-//            int count = 0;
-//            for (int i = 0; i < 90000; i++) {
-//                results[i] = (byte) 127;
-//            }
 
-            int width = (results[2] << 24 & 0xFF) + (results[3] << 16 & 0xFF) + (results[4] << 8 & 0xFF) + (results[5] & 0xFF);
-            int height = (results[6] << 24 & 0xFF) + (results[7] << 16 & 0xFF) + (results[8] << 8 & 0xFF) + (results[9] & 0xFF);
-            Log.d(TAG, "onMappingStream: " + width + " " + height);
-//            for (int i = 10; i < 90010; i++) {
-//                results[i] = (byte) 127;
-//            }
-
-            Bitmap bitmap = Bitmap.createBitmap(width, height , Bitmap.Config.ARGB_8888);
-
-            int count = 10;
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    // 0、1、2、3 转换成灰度值
-                    if (results[count] == 0) {
-                        bitmap.setPixel(j, i, 255);
-                    } else if (results[count] == 1) {
-                        bitmap.setPixel(j, i, 0);
-                    } else if (results[count] == 2) {
-                        bitmap.setPixel(j, i, 100);
-                    } else {
-                        bitmap.setPixel(j, i, 200);
-                    }
-                    count++;
-                }
+            int width = 300;
+            int height = 300;
+            byte[] data = new byte[90000];
+            for (int i = 0; i < 90000; i++) {
+                data[i] = 100;
             }
+//            int width = (results[2] << 24 & 0xFF) + (results[3] << 16 & 0xFF) + (results[4] << 8 & 0xFF) + (results[5] & 0xFF);
+//            int height = (results[6] << 24 & 0xFF) + (results[7] << 16 & 0xFF) + (results[8] << 8 & 0xFF) + (results[9] & 0xFF);
+            Log.d(TAG, "onMappingStream: " + width + " " + height);
 
-            Drawable drawable = new BitmapDrawable(bitmap);
-            PhotoView photoView = rootView.findViewById(R.id.photo_view);
-            photoView.setImageDrawable(drawable);
+//            Bitmap bitmap = Bitmap.createBitmap(width, height , Bitmap.Config.ARGB_8888);
+            YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, width, height, null);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            yuvimage.compressToJpeg(new Rect(0, 0, width, height), 80, byteArrayOutputStream);  // 这里 80 是图片质量，取值范围 0-100，100为品质最高
+            byte[] jdata = byteArrayOutputStream.toByteArray();
+
+            // 这时候 bmp 就不为 null 了
+            Bitmap bitmap = BitmapFactory.decodeByteArray(jdata, 0, jdata.length);
+            Log.d(TAG, "onMappingStream: " + bitmap);
+
+//            int count = 0;
+//            for (int i = 0; i < height; i++) {
+//                for (int j = 0; j < width; j++) {
+//                    // 0、1、2、3 转换成灰度值
+//                    if (results[count] == 0) {
+//                        bitmap.setPixel(j, i, 255);
+//                    } else if (results[count] == 1) {
+//                        bitmap.setPixel(j, i, 0);
+//                    } else if (results[count] == 2) {
+//                        bitmap.setPixel(j, i, 100);
+//                    } else {
+//                        bitmap.setPixel(j, i, 200);
+//                    }
+//                    count++;
+//                }
+//            }
+
+//            Drawable drawable = new BitmapDrawable(bitmap);
+//            Log.d(TAG, "onMappingStream: " + drawable);
+//            photoView = (PhotoView) rootView.findViewById(R.id.photo_view);
+//            photoView.setImageDrawable(drawable);
+//            Drawable bitmap1 = getResources().getDrawable(R.drawable.img_spalsh);
+//            Log.d(TAG, "onMappingStream: " + bitmap1);
+            photoView.setImageBitmap(bitmap);
         }
     };
 }

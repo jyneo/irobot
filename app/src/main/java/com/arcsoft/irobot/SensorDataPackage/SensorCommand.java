@@ -7,6 +7,8 @@ package com.arcsoft.irobot.SensorDataPackage;
 
 public class SensorCommand {
     public static final int kReset = 7;
+    public static final int kStartRecording = 126;
+    public static final int kStopRecording = 127;
     public static final int kStart = 128;
     public static final int kBaud = 129;
     public static final int kControl = 130;

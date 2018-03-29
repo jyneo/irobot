@@ -2,7 +2,7 @@ package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +49,8 @@ public class RobotSystemFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_robot_system, container, false);
 
         getFragmentManager().beginTransaction()
-                .replace(R.id.fragment_robot_control, new RobotControlFragment())
+                .replace(R.id.container_control, RobotControlFragment.newInstance())
+                .replace(R.id.container_camera, RobotCameraFragment.newInstance())
                 .commit();
         return view;
     }
@@ -58,7 +59,7 @@ public class RobotSystemFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final Button connect_button = getActivity().findViewById(R.id.wifi_connect_button);
+        final Button connect_button = (Button) getActivity().findViewById(R.id.wifi_connect_button);
         connect_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,11 +73,11 @@ public class RobotSystemFragment extends Fragment {
             }
         });
 
-        final Button send_button = getActivity().findViewById(R.id.send_message_button);
+        final Button send_button = (Button) getActivity().findViewById(R.id.send_message_button);
         send_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editText = getActivity().findViewById(R.id.send_message_text);
+                editText = (EditText) getActivity().findViewById(R.id.send_message_text);
                 try {
                     if (create2 != null && create2.isConnecting()) {
                         create2.write(editText.getText().toString().getBytes());

@@ -2,7 +2,7 @@ package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +10,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.arcsoft.irobot.R;
-import com.arcsoft.irobot.interfaces.IRobot;
 
 /**
  * Robot status panel to show all status of robot.
@@ -22,10 +21,8 @@ public class RobotStatusFragment extends Fragment {
     private static final boolean DEBUG = true;	// TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
 
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_VALUES = "values";
 
-    private IRobot mCreate2Parent;
     private TextView[] mValueTextViews;
 
     public RobotStatusFragment() {
@@ -61,32 +58,18 @@ public class RobotStatusFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        //if (DEBUG) Log.d(TAG, "onSaveInstanceState");
-//        int[] values = new int[mValueTextViews.length];
-//        for (int i = 0; i < mValueTextViews.length; i++) {
-//            try {
-//                values[i] = Integer.parseInt(mValueTextViews[i].getText().toString(), 10);
-//            } catch (NumberFormatException e) {
-//                values = null;
-//                break;
-//            }
-//        }
-//        outState.putIntArray(ARG_VALUES, values);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onResume() {
-        //if (DEBUG) Log.v(TAG, "onResume");
         super.onResume();
         // Update status when navigating back
     }
 
     @Override
     public void onDetach() {
-        // if (DEBUG) Log.d(TAG, "onDetach");
         super.onDetach();
-        mCreate2Parent = null;
     }
 
 //    private void createStatusTableView(View rootView) {

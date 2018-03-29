@@ -11,7 +11,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical"
-        tools:context=".fragment.RobotGridMapFragment">
+        tools:context=".fragment.RobotTrajectoryFragment">
 
         <com.arcsoft.irobot.view.GridMapView
             android:id="@+id/grid_map_view"

@@ -2,7 +2,7 @@ package com.arcsoft.irobot.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +20,16 @@ import com.arcsoft.irobot.view.RobotJoyStick;
 
 public class RobotControlFragment extends Fragment {
 
-    private static final boolean DEBUG = true;  // TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
 
     private Create2 create2;
 
     public RobotControlFragment() {
         // Required empty public constructor
+    }
+
+    public static RobotControlFragment newInstance() {
+        return new RobotControlFragment();
     }
 
     @Override
@@ -43,7 +46,7 @@ public class RobotControlFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_robot_control, container, false);
-        RobotJoyStick mRobotJoyStick = view.findViewById(R.id.rocker_view);
+        RobotJoyStick mRobotJoyStick = (RobotJoyStick) view.findViewById(R.id.rocker_view);
 
         create2 = new Create2();
 
@@ -69,7 +72,7 @@ public class RobotControlFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
 
-        Button stop_button = getActivity().findViewById(R.id.irobot_reset);
+        Button stop_button = (Button) getActivity().findViewById(R.id.irobot_reset);
         stop_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,7 +83,7 @@ public class RobotControlFragment extends Fragment {
             }
         });
 
-        Button start_button = getActivity().findViewById(R.id.irobot_start);
+        Button start_button = (Button) getActivity().findViewById(R.id.irobot_start);
         start_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,7 +94,7 @@ public class RobotControlFragment extends Fragment {
             }
         });
 
-        Button reset_button = getActivity().findViewById(R.id.irobot_stop);
+        Button reset_button = (Button) getActivity().findViewById(R.id.irobot_stop);
         reset_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +105,7 @@ public class RobotControlFragment extends Fragment {
             }
         });
 
-        Button safe_button = getActivity().findViewById(R.id.irobot_safe_mode);
+        Button safe_button = (Button) getActivity().findViewById(R.id.irobot_safe_mode);
         safe_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,7 +116,7 @@ public class RobotControlFragment extends Fragment {
             }
         });
 
-        Button full_button = getActivity().findViewById(R.id.irobot_full_mode);
+        Button full_button = (Button) getActivity().findViewById(R.id.irobot_full_mode);
         full_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,13 +127,6 @@ public class RobotControlFragment extends Fragment {
             }
         });
 
-        Button record_button = getActivity().findViewById(R.id.record_toggle_button);
-        record_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
     }
 
     @Override

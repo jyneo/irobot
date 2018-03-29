@@ -1,8 +1,8 @@
 package com.arcsoft.irobot.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,19 +32,12 @@ public class RobotUtilityFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        //if (DEBUG) Log.d(TAG, "onAttach");
         super.onAttach(context);
-//        if (context instanceof View.OnClickListener) {
-//            mOnClickListener = (View.OnClickListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString() + " must implement View.OnClickListener");
-//        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //if (DEBUG) Log.d(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_robot_utility, container, false);
 //        int[] buttonIds = {
 //                R.id.load_map_btn,
@@ -73,6 +66,5 @@ public class RobotUtilityFragment extends Fragment {
         super.onResume();
         if (DEBUG) Log.v(TAG, "onResume");
         // Update status when navigating back
-//        onSystemStatusChanged();
     }
 }

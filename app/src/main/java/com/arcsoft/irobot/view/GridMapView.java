@@ -114,11 +114,15 @@ public class GridMapView extends View {
         for (PointF pointF : mPointList) {
             canvas.drawCircle(pointF.x, pointF.y, cR, mPaint);
 
-            canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
+//            canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
 
             mCurX = pointF.x;
             mCurY = pointF.y;
 
+        }
+
+        if (mTrajectoryPath != null) {
+            canvas.drawLines(mTrajectoryPath, mPaint);
         }
 
         // 画箭头
@@ -129,6 +133,56 @@ public class GridMapView extends View {
         canvas.drawArc(mArrowRect, 0, 360, false, mStrokePaint);
         canvas.restore(); // 恢复画布
 
+    }
+
+    private float[] mTrajectoryPath;
+    public void setGridMap1(Float[] array) {
+        // 存储轨迹的点数据
+        float[] position = new float[array.length - array.length / 3];
+        for (int i = 0; i < array.length / 3; i++) {
+            position[i * 2] = array[i * 3];
+            position[i * 2 + 1] = array[i * 3 + 1];
+        }
+
+        // 轨迹的点数据转换成canvas path格式的数组
+        mTrajectoryPath = getPath(position);
+
+        for (int i = 0; i < array.length; i++) {
+            if (array[i * 3 + 2] < 0)
+                mOrientation = array[i * 3 + 2] + 360; // 获取方向
+
+            float x = array[i * 3];
+            float y = array[i * 3 + 1];
+
+            mPointList.add(new PointF(x * 200 + getWidth() / 2, y * 200 + getHeight() / 2)); // 存储所有轨迹点
+        }
+
+        // 刷新view
+        invalidate();
+    }
+
+    private float[] getPath(float[] position) {
+        if (position.length > 4) {
+            int count = (position.length / 2 - 2) * 2 + 2;
+            float[] path = new float[count * 2];
+            for (int i = 0; i < count; i++) {
+                if (i == 0) {
+                    path[((i * 2 - 1) + 1) * 2] = position[i * 2];
+                    path[((i * 2 - 1) + 1) * 2 + 1] = position[i * 2 + 1];
+                }
+                if (i == count - 1) {
+                    path[(i * 2 - 1) * 2] = position[i * 2];
+                    path[(i * 2 - 1) * 2 + 1] = position[i * 2 + 1];
+                }
+                path[(i * 2 - 1) * 2] = position[i * 2];
+                path[(i * 2 - 1) * 2 + 1] = position[i * 2 + 1];
+                path[((i * 2 - 1) + 1) * 2] = position[i * 2];
+                path[((i * 2 - 1) + 1) * 2 + 1] = position[i * 2 + 1];
+            }
+            return path;
+        } else {
+            return null;
+        }
     }
 
     public void setGridMap(Point pointF, int orientation) {
@@ -144,7 +198,7 @@ public class GridMapView extends View {
         Log.d("GridMapView", "setGridMap: " + pointF.x + " " + pointF.y + " " + mOrientation);
         mPointList.add(new PointF(pointF.x + getWidth() / 2, pointF.y + getHeight() / 2));
 
-        //刷新view
+        // 刷新view
         invalidate();
     }
 

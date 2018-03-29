@@ -1,32 +1,78 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="220dp"
     android:orientation="vertical"
-    tools:context=".fragment.RobotCameraFragment">
+    android:background="#111111">
 
-    <TextView
-        android:id="@+id/slam_status_label"
+    <com.arcsoft.irobot.view.AutoFitTextureView
+        android:id="@+id/texture_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="180dp"
+        android:layout_centerHorizontal="true"/>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:text="[status]"/>
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/texture_camera"
+        android:background="#111111">
 
-    <RelativeLayout
-        style="@style/AppTheme.HorizontalViewGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000">
+        <Button
+            android:id="@+id/recording_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Start Recording" />
 
-        <!--<com.arcsoft.irobot.widget.TrackedFrameView-->
-            <!--android:id="@+id/tracked_frame_view"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_centerHorizontal="true"-->
-            <!--res:aspectRatioWidth="1"-->
-            <!--res:aspectRatioHeight="1"-->
-            <!--res:maxHeight="200dp" />-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|left"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:orientation="horizontal">
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/timestamp_minute_prefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7F00FF"
+                android:textSize="20sp"
+                android:text="0"/>
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/timestamp_minute_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7F00FF"
+                android:textSize="20sp"
+                android:text="0"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7F00FF"
+                android:textSize="20sp"
+                android:text=": "/>
+
+            <TextView
+                android:id="@+id/timestamp_second_prefix"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7F00FF"
+                android:textSize="20sp"
+                android:text="0"/>
+
+            <TextView
+                android:id="@+id/timestamp_second_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7F00FF"
+                android:textSize="20sp"
+                android:text="0"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+</RelativeLayout>

@@ -17,20 +17,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="fill_horizontal"
             android:text="Connect WiFi" />
-        <!--<EditText-->
-            <!--android:background="@android:color/darker_gray"-->
-            <!--android:id="@+id/editText"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_marginBottom="5dp"-->
-            <!--/>-->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <!-- 用于发送信息的文本框-->
             <EditText
                 android:id="@+id/send_message_text"
                 android:layout_weight="1"
@@ -48,23 +40,15 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="250dp"
-        android:layout_height="165dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_gravity="center"/>
-
-    <!--<FrameLayout-->
-        <!--android:id="@+id/fragment_camera_view"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:name="com.arcsoft.irobot.fragment.RobotCameraFragment" />-->
-
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/container_camera"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:name="com.arcsoft.irobot.fragment.RobotCameraFragment" />
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -72,13 +56,13 @@
             android:orientation="vertical">
 
             <FrameLayout
-                android:id="@+id/fragment_robot_control"
+                android:id="@+id/container_control"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:name="com.arcsoft.irobot.fragment.RobotControlFragment" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    <!--</LinearLayout>-->
 
 </LinearLayout>

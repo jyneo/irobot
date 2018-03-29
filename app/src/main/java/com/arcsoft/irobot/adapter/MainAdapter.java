@@ -1,8 +1,8 @@
 package com.arcsoft.irobot.adapter;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -11,11 +11,13 @@ import java.util.List;
  * Created by yj2595 on 2018/3/6.
  */
 
-public class MainAdapter extends FragmentPagerAdapter {
+public class MainAdapter extends MyPagerAdapter {
     private List<Fragment> mFragmentList;
+    private FragmentManager fragmentManager;
 
     public MainAdapter(FragmentManager fm, List<Fragment> mFragmentList) {
-        super(fm);
+        super(fm, mFragmentList);
+        this.fragmentManager = fm;
         this.mFragmentList = mFragmentList;
     }
 
@@ -27,5 +29,19 @@ public class MainAdapter extends FragmentPagerAdapter {
     @Override
     public int getCount() {
         return mFragmentList.size();
+    }
+
+    @Override
+    public Fragment instantiateItem(ViewGroup container, int position) {
+        Fragment fragment = (Fragment) super.instantiateItem(container, position);
+        fragmentManager.beginTransaction().show(fragment).commit();
+        return fragment;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        // super.destroyItem(container, position, object);
+        Fragment fragment = mFragmentList.get(position);
+        fragmentManager.beginTransaction().hide(fragment).commit();
     }
 }
