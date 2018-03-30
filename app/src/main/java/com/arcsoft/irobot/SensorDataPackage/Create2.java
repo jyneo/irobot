@@ -21,6 +21,7 @@ public class Create2 {
     private static final String TAG = "Create2";
     private static final int TRAJECTORY = 1;
     private static final int MAPPING = 2;
+    private static final int ROBOT_STATUS = 3;
     private final Object mSocketSync = new Object();
     private final Object mStreamSync = new Object();
     private static boolean mIsConnecting = false; // 连接还是断开
@@ -30,6 +31,7 @@ public class Create2 {
 
     private static TrajectoryStreamCallback mTrajectoryStreamCallback;
     private static MappingStreamCallback mMappingStreamCallback;
+    private static RobotStatusCallback mRobotStatusCallback;
 
     public interface TrajectoryStreamCallback {
         void onTrajectoryStream(final float[] results);
@@ -37,6 +39,10 @@ public class Create2 {
 
     public interface MappingStreamCallback {
         void onMappingStream(final byte[] results);
+    }
+
+    public interface RobotStatusCallback {
+        void onRobotStatus(final byte[] results);
     }
 
     public Create2(){
@@ -50,7 +56,7 @@ public class Create2 {
                 // 用InetAddress方法获取ip地址
 //                String IP = "192.168.123.1";
 //                String IP = "192.168.100.1";
-                String IP = "10.16.202.178";
+                String IP = "10.37.50.79";
                 String PORT = "8888";
                 InetAddress ipAddress = InetAddress.getByName(IP);
                 int port = Integer.valueOf(PORT); // 获取端口号
@@ -82,8 +88,6 @@ public class Create2 {
                 outputStream = null;
             }
             return false;
-        } finally {
-//            mIsConnecting = false;
         }
     }
 
@@ -111,6 +115,10 @@ public class Create2 {
 
     public void mappingStream(MappingStreamCallback callback){
         mMappingStreamCallback = callback;
+    }
+
+    public void robotStatus(RobotStatusCallback callback){
+        mRobotStatusCallback = callback;
     }
 
     public synchronized boolean isConnecting() {
@@ -145,54 +153,54 @@ public class Create2 {
                         Thread.sleep(30);
 
                         Log.d(TAG, "run: " + buffer[0] + " " + buffer[1]);
-//                        if(buffer[0] == -91 && buffer[1] == 90) {
-//
-//                            Log.d(TAG, "matrix data header currect");
-//                            for (int i = 0; i < 16; i++) {
-//                                Matrix_4x4[i] = byte2float(buffer, 4 * i + 2);
-//                            }
-//
-//                            if (mTrajectoryStreamCallback != null && isConnecting()) {
-//                                Message message = handler.obtainMessage();
-//                                message.what = TRAJECTORY;
-//                                Bundle bundle = new Bundle();
-//                                bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
-//                                message.setData(bundle);
-//                                message.sendToTarget();
-//                            }
-//                        }
+                        if(buffer[0] == -91 && buffer[1] == 90) {
 
-//                        if(length == 40010) {
-//                            Log.d(TAG, "run: " + buffer[0] + " " + buffer[1]);
-//                            if (buffer[0] == 90 && buffer[1] == -91) {
-//                                Log.d(TAG,"slam map data header currect");
-//
-//                                if (mMappingStreamCallback != null && isConnecting()) {
-//                                    Message message = handler.obtainMessage();
-//                                    message.what = MAPPING;
-//                                    Bundle bundle = new Bundle();
-//                                    bundle.putByteArray("mapping_buffer", buffer);
-//                                    message.setData(bundle);
-//                                    message.sendToTarget();
-//                                }
-//                            }
-//                        }
+                            Log.d(TAG, "matrix data header currect");
+                            for (int i = 0; i < 16; i++) {
+                                Matrix_4x4[i] = byte2float(buffer, 4 * i + 2);
+                            }
+
+                            if (mTrajectoryStreamCallback != null && isConnecting()) {
+                                Message message = handler.obtainMessage();
+                                message.what = TRAJECTORY;
+                                Bundle bundle = new Bundle();
+                                bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
+                                message.setData(bundle);
+                                message.sendToTarget();
+                            }
+                        }
+
+                        if(length == 40010) {
+                            Log.d(TAG, "run: " + buffer[0] + " " + buffer[1]);
+                            if (buffer[0] == 90 && buffer[1] == -91) {
+                                Log.d(TAG,"slam map data header currect");
+
+                                if (mMappingStreamCallback != null && isConnecting()) {
+                                    Message message = handler.obtainMessage();
+                                    message.what = MAPPING;
+                                    Bundle bundle = new Bundle();
+                                    bundle.putByteArray("mapping_buffer", buffer);
+                                    message.setData(bundle);
+                                    message.sendToTarget();
+                                }
+                            }
+                        }
 
 //                        for (int i = 0; i < 16; i++) {
 //                            Matrix_4x4[i] = byte2float(buffer, 4 * i);
 //                        }
 //
 //                        Log.d(TAG, "run: " + mTrajectoryStreamCallback + " " + mMappingStreamCallback);
-//
-                        if (mTrajectoryStreamCallback != null && isConnecting()) {
-                            Message message = handler.obtainMessage();
-                            message.what = TRAJECTORY;
-                            Bundle bundle = new Bundle();
-                            bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
-                            message.setData(bundle);
-                            message.sendToTarget();
-                        }
-//
+
+//                        if (mTrajectoryStreamCallback != null && isConnecting()) {
+//                            Message message = handler.obtainMessage();
+//                            message.what = TRAJECTORY;
+//                            Bundle bundle = new Bundle();
+//                            bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
+//                            message.setData(bundle);
+//                            message.sendToTarget();
+//                        }
+
 //                        byte[] mapping_buffer = new byte[90000];
 //                        if (mMappingStreamCallback != null && isConnecting()) {
 //                            Log.d(TAG, "run: 触发");
@@ -204,9 +212,17 @@ public class Create2 {
 //                            message.sendToTarget();
 //                        }
 
+//                        if (mRobotStatusCallback != null && isConnecting()) {
+//                            Message message = handler.obtainMessage();
+//                            message.what = ROBOT_STATUS;
+//                            Bundle bundle = new Bundle();
+//                            bundle.putFloatArray("status_buffer", Matrix_4x4);
+//                            message.setData(bundle);
+//                            message.sendToTarget();
+//                        }
+
                     }
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
@@ -228,6 +244,11 @@ public class Create2 {
                     byte[] mapping_buffer = bundle.getByteArray("mapping_buffer");
                     mMappingStreamCallback.onMappingStream(mapping_buffer);
                     break;
+//                case ROBOT_STATUS:
+//                    bundle = message.getData();
+//                    byte[] status_buffer = bundle.getByteArray("status_buffer");
+//                    mMappingStreamCallback.onMappingStream(status_buffer);
+//                    break;
                 default:
                     break;
             }

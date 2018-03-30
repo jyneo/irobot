@@ -1,8 +1,8 @@
 package com.arcsoft.irobot.view;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,12 +12,12 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 
-import com.arcsoft.irobot.R;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -28,9 +28,11 @@ import java.util.List;
 
 public class GridMapView extends View {
 
+    private static final String TAG = "GridMapView";
     private Paint mPaint;
-
-//    private ScaleGestureDetector mScaleGestureDetector = null;
+    private Paint mTextPaint;
+    private Paint mPathPaint;
+    private PointF mCurrentPosition;
 
     private float mOrientation = 0;
     private Paint mStrokePaint; // 箭头圆环
@@ -61,11 +63,19 @@ public class GridMapView extends View {
         super(context, attrs, defStyleAttr);
         initPaint();     // 初始化画笔
         initArrowPath(); // 初始化箭头路径
-//        mScaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleGestureListener());
     }
 
     private void initPaint() {
         Log.d("GridMapView", "initPaint: ");
+        mTextPaint = new Paint();
+        mTextPaint.setColor(Color.WHITE);
+        mTextPaint.setTextSize(40);
+
+        mPathPaint = new Paint();
+        mPathPaint.setColor(Color.GREEN);
+        mPathPaint.setAntiAlias(true);
+        mPathPaint.setStyle(Paint.Style.FILL);
+
         mPaint = new Paint();
         mPaint.setColor(Color.GREEN);
         mPaint.setAntiAlias(true);
@@ -80,7 +90,8 @@ public class GridMapView extends View {
      * 初始化箭头
      */
     private void initArrowPath() {
-        Log.d("GridMapView", "initArrowPath: ");
+
+        mCurrentPosition = new PointF(mCurX, mCurY);
 
         // 初始化箭头路径
         mArrowPath = new Path();
@@ -88,17 +99,18 @@ public class GridMapView extends View {
         mArrowPath.lineTo(0, -3 * arrowR);
         mArrowPath.close();
 
-//        mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-        mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-        Log.d("GridMapView", "initArrowPath: " + mBitmap);
-        mSrcRect = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
-        Log.d("0000000", "initArrowPath: " + mBitmap.getWidth() + " " + getWidth());
-        // 计算左边位置
-//        int left = mTotalWidth / 2 - mBitmap.getWidth() / 2;
-        // 计算上边位置
-//        int top = mTotalHeight / 2 - mBitmap.getHeight() / 2;
-//        mDstRect = new Rect(left, top, mBitmap.getWidth() + left, mBitmap.getHeight() + top);
-        mDstRect = new Rect(0, 0, getWidth(), getHeight());
+        Resources resources = this.getResources();
+        DisplayMetrics dm = resources.getDisplayMetrics();
+        float density = dm.density;
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+
+        Log.d(TAG, "initArrowPath: " + width / density + " " + height / density);
+        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+//        mBitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+//        mSrcRect = new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight());
+//        mDstRect = new Rect(0, 0, getWidth(), getHeight());
         mArrowRect = new RectF(-arrowR * 0.8f, -arrowR * 0.8f, arrowR * 0.8f, arrowR * 0.8f);
     }
 
@@ -107,22 +119,43 @@ public class GridMapView extends View {
         super.onDraw(canvas);
         if (canvas == null || mBitmap == null)
             return;
-        Log.d("GridMapView", "onDraw: " + mBitmap);
-        canvas.drawBitmap(mBitmap, mSrcRect, mDstRect, null); // 将mBitmap绘到canLock
+
+        canvas.save();
+
+        int offsetX = 10;
+        int offsetY = 40;
+
+        if (mBitmap != null) {
+            canvas.drawText("[map bitmap: width=" + mBitmap.getWidth() + "  height=" + mBitmap.getHeight() + "]", offsetX, offsetY, mTextPaint);
+        } else {
+            canvas.drawText("[no map]", offsetX, offsetY, mTextPaint);
+        }
+
+        if (mCurrentPosition != null) {
+            offsetY += 50;
+            canvas.drawText("[current position: x=" + mCurrentPosition.x + "  y=" + mCurrentPosition.y + "]", offsetX, offsetY, mTextPaint);
+        }
+
+        if (mOrientation >= 0 && mOrientation < 360) {
+            offsetY += 50;
+            canvas.drawText("[current orientation: angle=" + mOrientation + "]", offsetX, offsetY, mTextPaint);
+        }
+
+        Log.d(TAG, "onDraw: " + Arrays.toString(mTrajectoryPath));
+        Log.d(TAG, "onDraw: " + mPointList.toString());
+        if (mTrajectoryPath != null) {
+            canvas.drawLines(mTrajectoryPath, mPathPaint);
+        }
+
+        canvas.drawBitmap(mBitmap, 0, 0, null); // 将mBitmap绘到canLock
 
         // 画点
         for (PointF pointF : mPointList) {
             canvas.drawCircle(pointF.x, pointF.y, cR, mPaint);
 
-//            canvas.drawLine(mCurX, mCurY, pointF.x, pointF.y, mPaint);
-
             mCurX = pointF.x;
             mCurY = pointF.y;
 
-        }
-
-        if (mTrajectoryPath != null) {
-            canvas.drawLines(mTrajectoryPath, mPaint);
         }
 
         // 画箭头
@@ -133,6 +166,7 @@ public class GridMapView extends View {
         canvas.drawArc(mArrowRect, 0, 360, false, mStrokePaint);
         canvas.restore(); // 恢复画布
 
+        canvas.restore();
     }
 
     private float[] mTrajectoryPath;
@@ -147,37 +181,48 @@ public class GridMapView extends View {
         // 轨迹的点数据转换成canvas path格式的数组
         mTrajectoryPath = getPath(position);
 
-        for (int i = 0; i < array.length; i++) {
+        for (int i = 0; i < array.length / 3; i++) {
             if (array[i * 3 + 2] < 0)
                 mOrientation = array[i * 3 + 2] + 360; // 获取方向
+            mOrientation = array[i * 3 + 2];
 
             float x = array[i * 3];
             float y = array[i * 3 + 1];
 
-            mPointList.add(new PointF(x * 200 + getWidth() / 2, y * 200 + getHeight() / 2)); // 存储所有轨迹点
+            mCurrentPosition.x = x;
+            mCurrentPosition.y = y;
+            mPointList.add(new PointF(x, y)); // 存储所有轨迹点
         }
 
         // 刷新view
         invalidate();
     }
 
+    public void clearData() {
+        mBitmap = null;
+        mTrajectoryPath = null;
+        mCurrentPosition = null;
+        mOrientation = 0;
+    }
+
     private float[] getPath(float[] position) {
         if (position.length > 4) {
             int count = (position.length / 2 - 2) * 2 + 2;
+            Log.d(TAG, "getPath: " + position.length + " " + count);
             float[] path = new float[count * 2];
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < position.length / 2; i++) {
                 if (i == 0) {
                     path[((i * 2 - 1) + 1) * 2] = position[i * 2];
                     path[((i * 2 - 1) + 1) * 2 + 1] = position[i * 2 + 1];
-                }
-                if (i == count - 1) {
+                } else if (i == position.length / 2 - 1 ) {
                     path[(i * 2 - 1) * 2] = position[i * 2];
                     path[(i * 2 - 1) * 2 + 1] = position[i * 2 + 1];
+                } else {
+                    path[(i * 2 - 1) * 2] = position[i * 2];
+                    path[(i * 2 - 1) * 2 + 1] = position[i * 2 + 1];
+                    path[((i * 2 - 1) + 1) * 2] = position[i * 2];
+                    path[((i * 2 - 1) + 1) * 2 + 1] = position[i * 2 + 1];
                 }
-                path[(i * 2 - 1) * 2] = position[i * 2];
-                path[(i * 2 - 1) * 2 + 1] = position[i * 2 + 1];
-                path[((i * 2 - 1) + 1) * 2] = position[i * 2];
-                path[((i * 2 - 1) + 1) * 2 + 1] = position[i * 2 + 1];
             }
             return path;
         } else {
@@ -211,51 +256,5 @@ public class GridMapView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
     }
-
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        // 返回给ScaleGestureDetector来处理
-//        return mScaleGestureDetector.onTouchEvent(event);
-//    }
-//
-//    public class ScaleGestureListener implements ScaleGestureDetector.OnScaleGestureListener {
-//
-//        private float scale;
-//        private float preScale = 1; // 默认前一次缩放比例为1
-//        GridMapView gridMapView = getRootView().findViewById(R.id.grid_map_view);
-//
-//        @Override
-//        public boolean onScale(ScaleGestureDetector detector) {
-//
-//            float previousSpan = detector.getPreviousSpan();
-//            float currentSpan = detector.getCurrentSpan();
-//            if (currentSpan < previousSpan) {
-//                // 缩小
-//                // scale = preScale-detector.getScaleFactor()/3;
-//                scale = preScale - (previousSpan - currentSpan) / 1000;
-//            } else {
-//                // 放大
-//                // scale = preScale+detector.getScaleFactor()/3;
-//                scale = preScale + (currentSpan - previousSpan) / 1000;
-//            }
-//
-//            // 缩放view
-//            ViewHelper.setScaleX(gridMapView, scale ); // x方向上缩小
-//            ViewHelper.setScaleY(gridMapView, scale ); // y方向上缩小
-//
-//            return false;
-//        }
-//
-//        @Override
-//        public boolean onScaleBegin(ScaleGestureDetector detector) {
-//            // 一定要返回true才会进入onScale()这个函数
-//            return true;
-//        }
-//
-//        @Override
-//        public void onScaleEnd(ScaleGestureDetector detector) {
-//            preScale = scale; //记录本次缩放比例
-//        }
-//    }
 
 }

@@ -3,10 +3,6 @@ package com.arcsoft.irobot.fragment;
 import android.app.Fragment;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +13,6 @@ import com.arcsoft.irobot.R;
 import com.arcsoft.irobot.SensorDataPackage.Create2;
 import com.github.chrisbanes.photoview.PhotoView;
 import com.github.chrisbanes.photoview.PhotoViewAttacher;
-
-import java.io.ByteArrayOutputStream;
 
 /**
  *
@@ -50,13 +44,9 @@ public class RobotMappingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_robot_mapping, container, false);
-//        PhotoView photoView = rootView.findViewById(R.id.photo_view);
-//        Drawable bitmap = getResources().getDrawable(R.drawable.img_spalsh);
-//        photoView.setImageDrawable(bitmap);
         photoView = (PhotoView) rootView.findViewById(R.id.photo_view);
         attacher = new PhotoViewAttacher(photoView);
         create2 = new Create2();
-//        create2.mappingStream(mMappingStreamCallback);
 
         return rootView;
     }
@@ -84,6 +74,106 @@ public class RobotMappingFragment extends Fragment {
         super.onDestroy();
     }
 
+    public final Create2.MappingStreamCallback mMappingStreamCallback = new Create2.MappingStreamCallback() {
+        @Override
+        public void onMappingStream(byte[] results) {
+
+//            int width = 300;
+//            int height = 300;
+//            Random random = new Random();
+//            byte[] data = new byte[90000];
+//            int[] colors = new int[90000];
+//            for (int i = 0; i < 90000; i++) {
+//                data[i] = (byte) random.nextInt(4);
+//            }
+//            int count = 0;
+//            for (int i = 0; i < height; i++) {
+//                for (int j = 0; j < width; j++) {
+//                    if (data[count] == 0) {
+//                        colors[count] = (128 << 16) | (128 << 8) | 128 | 0xFF000000;
+//                    } else if (data[count] == 1) {
+//                        colors[count] = (255 << 16) | (127 << 8) | 80 | 0xFF000000;
+//                    } else if (data[count] == 2) {
+//                        colors[count] = (128 << 8) | 0xFF000000;
+//                    } else {
+//                        colors[count] = (255 << 16) | (255 << 8) | 255 | 0xFF000000;
+//                    }
+//                    count++;
+//                }
+//            }
+
+            int width = (results[2] << 24 & 0xFF) + (results[3] << 16 & 0xFF) + (results[4] << 8 & 0xFF) + (results[5] & 0xFF);
+            int height = (results[6] << 24 & 0xFF) + (results[7] << 16 & 0xFF) + (results[8] << 8 & 0xFF) + (results[9] & 0xFF);
+            Log.d(TAG, "onMappingStream: " + width + " " + height);
+
+            int[] colors = new int[width * height];
+            int count = 0;
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    if (results[count + 10] == 0) {
+                        colors[count] = (128 << 16) | (128 << 8) | 128 | 0xFF000000;
+                    } else if (results[count + 10] == 1) {
+                        colors[count] = (255 << 16) | (127 << 8) | 80 | 0xFF000000;
+                    } else if (results[count + 10] == 2) {
+                        colors[count] = (128 << 8) | 0xFF000000;
+                    } else {
+                        colors[count] = (255 << 16) | (255 << 8) | 255 | 0xFF000000;
+                    }
+                    count++;
+                }
+            }
+
+            Bitmap bitmap = Bitmap.createBitmap(colors, 0, width, width, height, Bitmap.Config.ARGB_8888);
+            photoView.setImageBitmap(bitmap);
+        }
+    };
+
+    // 将纯RGB数据数组转化成int像素数组
+    public int[] convertByteToColor(byte[] data){
+        int size = data.length;
+        if (size == 0){
+            return null;
+        }
+
+        int arg = 0;
+        if (size % 3 != 0){
+            arg = 1;
+        }
+
+        // 一般情况下data数组的长度应该是3的倍数，这里做个兼容，多余的RGB数据用黑色0XFF000000填充
+        int[] color = new int[size / 3 + arg];
+        int red, green, blue;
+
+        if (arg == 0) {
+            for(int i = 0; i < color.length; ++i){
+                red = convertByteToInt(data[i * 3]);
+                green = convertByteToInt(data[i * 3 + 1]);
+                blue = convertByteToInt(data[i * 3 + 2]);
+
+                // 获取RGB分量值通过按位或生成int的像素值
+                color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
+            }
+        } else{
+            for(int i = 0; i < color.length - 1; ++i){
+                red = convertByteToInt(data[i * 3]);
+                green = convertByteToInt(data[i * 3 + 1]);
+                blue = convertByteToInt(data[i * 3 + 2]);
+                color[i] = (red << 16) | (green << 8) | blue | 0xFF000000;
+            }
+
+            color[color.length - 1] = 0xFF000000;
+        }
+
+        return color;
+    }
+
+    // 将一个byte数转成int, 实现这个函数的目的是为了将byte数当成无符号的变量去转化成int
+    public int convertByteToInt(byte data){
+        int heightBit = (data >> 4) & 0x0F;
+        int lowBit = 0x0F & data;
+        return heightBit * 16 + lowBit;
+    }
+
     public Bitmap getTranslateImage(Bitmap bitmap , int alpha) { // alpha: 0 - 255
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
@@ -101,55 +191,4 @@ public class RobotMappingFragment extends Fragment {
         }
         return  bitmap_new;
     }
-
-    public final Create2.MappingStreamCallback mMappingStreamCallback = new Create2.MappingStreamCallback() {
-        @Override
-        public void onMappingStream(byte[] results) {
-
-            int width = 300;
-            int height = 300;
-            byte[] data = new byte[90000];
-            for (int i = 0; i < 90000; i++) {
-                data[i] = 100;
-            }
-//            int width = (results[2] << 24 & 0xFF) + (results[3] << 16 & 0xFF) + (results[4] << 8 & 0xFF) + (results[5] & 0xFF);
-//            int height = (results[6] << 24 & 0xFF) + (results[7] << 16 & 0xFF) + (results[8] << 8 & 0xFF) + (results[9] & 0xFF);
-            Log.d(TAG, "onMappingStream: " + width + " " + height);
-
-//            Bitmap bitmap = Bitmap.createBitmap(width, height , Bitmap.Config.ARGB_8888);
-            YuvImage yuvimage = new YuvImage(data, ImageFormat.NV21, width, height, null);
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            yuvimage.compressToJpeg(new Rect(0, 0, width, height), 80, byteArrayOutputStream);  // 这里 80 是图片质量，取值范围 0-100，100为品质最高
-            byte[] jdata = byteArrayOutputStream.toByteArray();
-
-            // 这时候 bmp 就不为 null 了
-            Bitmap bitmap = BitmapFactory.decodeByteArray(jdata, 0, jdata.length);
-            Log.d(TAG, "onMappingStream: " + bitmap);
-
-//            int count = 0;
-//            for (int i = 0; i < height; i++) {
-//                for (int j = 0; j < width; j++) {
-//                    // 0、1、2、3 转换成灰度值
-//                    if (results[count] == 0) {
-//                        bitmap.setPixel(j, i, 255);
-//                    } else if (results[count] == 1) {
-//                        bitmap.setPixel(j, i, 0);
-//                    } else if (results[count] == 2) {
-//                        bitmap.setPixel(j, i, 100);
-//                    } else {
-//                        bitmap.setPixel(j, i, 200);
-//                    }
-//                    count++;
-//                }
-//            }
-
-//            Drawable drawable = new BitmapDrawable(bitmap);
-//            Log.d(TAG, "onMappingStream: " + drawable);
-//            photoView = (PhotoView) rootView.findViewById(R.id.photo_view);
-//            photoView.setImageDrawable(drawable);
-//            Drawable bitmap1 = getResources().getDrawable(R.drawable.img_spalsh);
-//            Log.d(TAG, "onMappingStream: " + bitmap1);
-            photoView.setImageBitmap(bitmap);
-        }
-    };
 }

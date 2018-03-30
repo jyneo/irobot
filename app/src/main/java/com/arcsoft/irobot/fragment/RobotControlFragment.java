@@ -56,7 +56,7 @@ public class RobotControlFragment extends Fragment {
                 if (create2 != null && create2.isConnecting()) {
                     Log.d(TAG, "setVelocityLR: " + left + " " + right);
 
-                    try{
+                    try {
                         Thread.sleep(20);
                         create2.driveWheels(left, right);
                     } catch (Exception e){

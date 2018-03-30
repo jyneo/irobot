@@ -6,19 +6,6 @@
     android:background="#111111"
     tools:context=".fragment.RobotStatusFragment">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/update_status_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update All Status"/>
-
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -41,18 +28,6 @@
                     android:background="@drawable/cell_border"
                     android:textColor="#FFFFFF"
                     android:text="Name" />
-
-                <TextView
-                    style="@style/AppTheme.Label.Title"
-                    android:background="@drawable/cell_border"
-                    android:textColor="#FFFFFF"
-                    android:text="Min" />
-
-                <TextView
-                    style="@style/AppTheme.Label.Title"
-                    android:background="@drawable/cell_border"
-                    android:textColor="#FFFFFF"
-                    android:text="Max" />
 
                 <TextView
                     style="@style/AppTheme.Label.Title.Expand"

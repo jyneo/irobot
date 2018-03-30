@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationB
 
     @Override
     public void onTabSelected(int position) {
-        //tab被选中
+        // tab被选中
         viewPager.setCurrentItem(position);
 
     }

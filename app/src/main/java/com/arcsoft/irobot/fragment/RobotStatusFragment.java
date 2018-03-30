@@ -1,15 +1,18 @@
 package com.arcsoft.irobot.fragment;
 
+import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arcsoft.irobot.R;
+import com.arcsoft.irobot.SensorDataPackage.Create2;
 
 /**
  * Robot status panel to show all status of robot.
@@ -18,12 +21,13 @@ import com.arcsoft.irobot.R;
 
 public class RobotStatusFragment extends Fragment {
 
-    private static final boolean DEBUG = true;	// TODO set false on release
     private final String TAG = this.getClass().getSimpleName();
 
     private static final String ARG_VALUES = "values";
 
     private TextView[] mValueTextViews;
+
+    private Create2 create2;
 
     public RobotStatusFragment() {
         // Required empty public constructor
@@ -31,13 +35,7 @@ public class RobotStatusFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-        //if (DEBUG) Log.d(TAG, "onAttach");
         super.onAttach(context);
-//        if (context instanceof IRobot) {
-//            mCreate2Parent = (IRobot) context;
-//        } else {
-//            throw new RuntimeException(context.toString() + " must implement IRobotParent");
-//        }
     }
 
     @Override
@@ -46,13 +44,13 @@ public class RobotStatusFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        //if (DEBUG) Log.d(TAG, "onCreateView");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_robot_status, container, false);
-//        createStatusTableView(rootView);
-//        setStatus(savedInstanceState == null ? null : savedInstanceState.getIntArray(ARG_VALUES));
-        rootView.findViewById(R.id.update_status_button).setOnClickListener(mOnClickListener);
+        createStatusTableView(rootView);
+        setStatus(savedInstanceState == null ? null : savedInstanceState.getIntArray(ARG_VALUES));
+
+        create2 = new Create2();
+        create2.robotStatus(mRobotStatusCallback);
         return rootView;
     }
 
@@ -72,39 +70,33 @@ public class RobotStatusFragment extends Fragment {
         super.onDetach();
     }
 
-//    private void createStatusTableView(View rootView) {
-//        Context context = getActivity();
-//        TableLayout tableLayout = (TableLayout) rootView.findViewById(R.id.status_table_layout);
-//        mValueTextViews = new TextView[SensorPacket.kNum];
-//        for (int id = SensorPacket.kMin; id <= SensorPacket.kMax; id++) {
-//            SensorPacket.Info info = SensorPacket.getInfo(id);
-//
-//            TableRow row = new TableRow(context);
-//            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//
-//            TextView view = createCellTextView(context);
-//            view.setText(String.valueOf(id));
-//            row.addView(view);
-//
-//            view = createCellTextView(context);
-//            view.setText(info.name);
-//            row.addView(view);
-//
-//            view = createCellTextView(context);
-//            view.setText(String.valueOf(info.min));
-//            row.addView(view);
-//
-//            view = createCellTextView(context);
-//            view.setText(String.valueOf(info.max));
-//            row.addView(view);
-//
-//            view = createCellTextView(context);
-//            row.addView(view);
-//            mValueTextViews[id - SensorPacket.kMin] = view;
-//
-//            tableLayout.addView(row);
-//        }
-//    }
+    private void createStatusTableView(View rootView) {
+        Context context = getActivity();
+        TableLayout tableLayout = (TableLayout) rootView.findViewById(R.id.status_table_layout);
+        mValueTextViews = new TextView[2];
+
+        String[] name = new String[]{"state", "feedback"};
+
+        for (int id = 0; id <= 1; id++) {
+
+            TableRow row = new TableRow(context);
+            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            TextView view = createCellTextView(context);
+            view.setText(String.valueOf(id));
+            row.addView(view);
+
+            view = createCellTextView(context);
+            view.setText(name[id]);
+            row.addView(view);
+
+            view = createCellTextView(context);
+            row.addView(view);
+            mValueTextViews[id] = view;
+
+            tableLayout.addView(row);
+        }
+    }
 
     private TextView createCellTextView(final Context context) {
         TextView view = new TextView(context);
@@ -114,42 +106,50 @@ public class RobotStatusFragment extends Fragment {
         return view;
     }
 
-//    public void updateStatus() {
-//        Create2 robot = mCreate2Parent.getCreate2();
-//        SensorResult[] results = robot.query(SensorGroupPackage.kGroup_100);
-//        if (results == null) {
-//            Toast.makeText(getActivity(), "Querying failed!", Toast.LENGTH_SHORT).show();
-//            setStatus(null);
-//        } else {
-//            for (int i = 0; i < results.length; i++) {
-//                SensorResult result = results[i];
-//                //Log.d(TAG, String.format("updateStatus: id=%1$d, value=%2$d", result.id, result.value));
-//                final int idx = result.id - SensorPacket.kMin;
-//                mValueTextViews[idx].setText(String.valueOf(result.getFinalValue()));
-//            }
-//        }
-//    }
-
-    private void setStatus(final int[] values) {
-        //if (DEBUG) Log.d(TAG, "setStatus: values=" + values);
-//        if (values == null) {
-//            for (int i = 0; i < mValueTextViews.length; i++) {
-//                mValueTextViews[i].setText(""); // Reset to empty
-//            }
-//        } else {
-//            for (int i = 0; i < mValueTextViews.length; i++) {
-//                mValueTextViews[i].setText(String.valueOf(values[i])); // Reset to empty
-//            }
-//        }
+    public void updateStatus(byte[] results) {
+        if (results == null) {
+            Toast.makeText(getActivity(), "Status Querying failed!", Toast.LENGTH_SHORT).show();
+            setStatus(null);
+        } else {
+            for (byte id : results) {
+                mValueTextViews[id].setText(String.valueOf(results[id]));
+            }
+        }
     }
 
-    private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
+    private void setStatus(final int[] values) {
+        if (values == null) {
+            for (int i = 0; i < mValueTextViews.length; i++) {
+                mValueTextViews[i].setText(""); // Reset to empty
+            }
+        } else {
+            for (int i = 0; i < mValueTextViews.length; i++) {
+                mValueTextViews[i].setText(String.valueOf(values[i])); // Reset to empty
+            }
+        }
+    }
+
+    /** Fragment当前状态是否可见 */
+    private boolean isVisible;
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if(getUserVisibleHint()) {
+            isVisible = true;
+        } else {
+            isVisible = false;
+        }
+    }
+
+    private static byte[] results;
+    private final Create2.RobotStatusCallback mRobotStatusCallback = new Create2.RobotStatusCallback() {
         @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.update_status_button:
-//                    updateStatus();
-                    break;
+        public void onRobotStatus(byte[] results) {
+            byte[] result = new byte[]{0, 1};
+            if (isVisible) {
+                updateStatus(result);
             }
         }
     };

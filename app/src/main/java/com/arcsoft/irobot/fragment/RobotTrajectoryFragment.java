@@ -2,7 +2,6 @@ package com.arcsoft.irobot.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,7 +55,6 @@ public class RobotTrajectoryFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView: ");
         View rootView = inflater.inflate(R.layout.fragment_robot_gridmap, container, false);
         mMapView = (GridMapView) rootView.findViewById(R.id.grid_map_view);
         modeZ_button = (Button) rootView.findViewById(R.id.modeZ);
@@ -69,10 +67,6 @@ public class RobotTrajectoryFragment extends Fragment{
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState){
-        Log.d(TAG, "onActivityCreated: ");
-        if (isVisible()){
-            Log.d(TAG, "onActivityCreated: 1111111111");
-        }
         super.onActivityCreated(savedInstanceState);
 
         create2.trajectoryStream(mTrajectoryStreamCallback);
@@ -108,13 +102,12 @@ public class RobotTrajectoryFragment extends Fragment{
 
     @Override
     public void onResume() {
-        Log.d(TAG, "onResume: ");
         super.onResume();
         mMapViewUpdateTimer = new Timer();
         mMapViewUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (isVisible && create2.isConnecting()) {
+                if (create2.isConnecting()) {
                     handler.sendEmptyMessage(MSG_UPDATE_GRID_VIEW);
                 }
             }
@@ -123,7 +116,6 @@ public class RobotTrajectoryFragment extends Fragment{
 
     @Override
     public void onPause() {
-        Log.d(TAG, "onPause: ");
         super.onPause();
         if (mMapViewUpdateTimer != null) {
             mMapViewUpdateTimer.cancel();
@@ -144,10 +136,8 @@ public class RobotTrajectoryFragment extends Fragment{
 
         if(getUserVisibleHint()) {
             isVisible = true;
-            Log.d(TAG, "setUserVisibleHint: 可见");
         } else {
             isVisible = false;
-            Log.d(TAG, "setUserVisibleHint: 不可见");
         }
     }
 
@@ -160,8 +150,7 @@ public class RobotTrajectoryFragment extends Fragment{
             }
 
             Log.d("RobotTrajectoryFragment", "onTrajectoryStream: " + result[12] + " " + result[13]);
-            Point position = new Point(0,0);
-            // todo: 坐标转换
+//            Point position = new Point(0,0);
 //            position.x = (int) (result[12] * 1000);
 //            position.y = (int) (result[13] * 1000);
 //
@@ -175,14 +164,42 @@ public class RobotTrajectoryFragment extends Fragment{
 //            position.y = random.nextInt(1000) - 500;
 //            int orientation = random.nextInt(360);
 //            mMapView.setGridMap(position, orientation);
-//            list.add(result[12]);
-//            list.add(result[13]);
-//            list.add(result[0]);
-            list.add(result[12]);
-            list.add(result[13]);
+
+            list.add(result[12] * 300 + 720);
+            list.add(result[13] * 300 + 954);
             list.add(result[0]);
+
+//            Random random = new Random();
+//            Float a = (float) ((random.nextInt(6) - 3) * 200 + 720);
+//            Float b = (float) ((random.nextInt(6) - 3) * 200 + 954);
+//            Float c = (float) random.nextInt(360);
+//            list.add(a);
+//            list.add(b);
+//            list.add(c);
         }
     };
+
+    private Timer mMapViewUpdateTimer;
+    private static final int MSG_UPDATE_GRID_VIEW = 0;
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message message) {
+            switch (message.what){
+                case MSG_UPDATE_GRID_VIEW:
+                    if (isVisible) {
+                        mMapView.setGridMap1(listToArray(list));
+                    } else {
+                        mMapView.clearData();
+                    }
+                    break;
+            }
+            return false;
+        }
+    });
+
+    private Float[] listToArray(List<Float> list) {
+        return list.toArray(new Float[0]);
+    }
 
     public FloatBuffer floatToBuffer(float[] results) {
         // 先初始化 buffer，数组的长度 * 4，因为一个 float 占 4 个字节
@@ -195,24 +212,5 @@ public class RobotTrajectoryFragment extends Fragment{
         floatBuffer.put(results);
         floatBuffer.position(0);
         return floatBuffer;
-    }
-
-    private Timer mMapViewUpdateTimer;
-    private static final int MSG_UPDATE_GRID_VIEW = 0;
-    private Handler handler = new Handler(new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message message) {
-            switch (message.what){
-                case MSG_UPDATE_GRID_VIEW:
-                    Log.d(TAG, "handleMessage: " + " " + " run");
-                    mMapView.setGridMap1(listToArray(list));
-                    break;
-            }
-            return false;
-        }
-    });
-
-    private Float[] listToArray(List<Float> list) {
-        return list.toArray(new Float[0]);
     }
 }
