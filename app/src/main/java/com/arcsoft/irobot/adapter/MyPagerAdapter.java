@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 /**
- * 关于fragmentPagerAdapter的冲突问题: 为什么自己新建适配器不行
+ *
  * Created by yj2595 on 2018/3/28.
  */
 
@@ -44,7 +44,6 @@ public abstract class MyPagerAdapter extends PagerAdapter {
 
         final long itemId = getItemId(position);
 
-        // Do we already have this fragment?
         String name = makeFragmentName(container.getId(), itemId);
         Fragment fragment = mFragmentManager.findFragmentByTag(name);
         if (fragment != null) {
