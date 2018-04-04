@@ -22,12 +22,15 @@ public class Create2 {
     private static final int TRAJECTORY = 1;
     private static final int MAPPING = 2;
     private static final int ROBOT_STATUS = 3;
+    private static final int control = 1;
+    private static final int query_data = 2;
+
     private final Object mSocketSync = new Object();
     private final Object mStreamSync = new Object();
     private static boolean mIsConnecting = false; // 连接还是断开
-    private static Socket socket; // 定义socket
-    private static InputStream inputStream;
-    private static OutputStream outputStream;
+    private Socket socket; // 定义socket
+    private InputStream inputStream;
+    private OutputStream outputStream;
 
     private static TrajectoryStreamCallback mTrajectoryStreamCallback;
     private static MappingStreamCallback mMappingStreamCallback;
@@ -56,7 +59,7 @@ public class Create2 {
                 // 用InetAddress方法获取ip地址
 //                String IP = "192.168.123.1";
 //                String IP = "192.168.100.1";
-                String IP = "10.37.50.79";
+                String IP = "172.25.31.117";
                 String PORT = "8888";
                 InetAddress ipAddress = InetAddress.getByName(IP);
                 int port = Integer.valueOf(PORT); // 获取端口号
@@ -140,51 +143,71 @@ public class Create2 {
     // 接收线程
     class Receive_Thread extends Thread {
         public void run() {
-            while(true) {
+            SendData send_data = new SendData();
+            SendData rev_data = new SendData();
+
+            rev_data.head[0] = (byte) (0xa5 & 0xff);
+            rev_data.head[1] = (byte) (0x5a & 0xFF);
+            rev_data.data = null;
+
+            send_data.head[0] = (byte) (0xa5 & 0xff);
+            send_data.head[1] = (byte) (0x5a & 0xFF);
+            send_data.query_id = 2;
+
+            while(isConnecting() && !socket.isClosed()) {
                 try {
                     byte[] buffer = new byte[1024 * 1024]; // 创建接收缓冲区
                     float[] Matrix_4x4 = new float[16]; // 创建接收缓冲区
+
+                    // java.net.SocketException: Socket closed
                     inputStream = socket.getInputStream();
-                    int length = inputStream.read(buffer); // 数据读出来，并且返回数据的长度
+                    if (inputStream != null) {
+                        int length = inputStream.read(buffer); // 数据读出来，并且返回数据的长度
 
-                    Log.d(TAG, "length: " + length);
-                    if (length > 0) { // 如果数据不为空，每16个读成一个 4*4 矩阵
+                        if (length > 0) {
 
-                        Thread.sleep(30);
+                            Thread.sleep(30);
 
-                        Log.d(TAG, "run: " + buffer[0] + " " + buffer[1]);
-                        if(buffer[0] == -91 && buffer[1] == 90) {
-
-                            Log.d(TAG, "matrix data header currect");
-                            for (int i = 0; i < 16; i++) {
-                                Matrix_4x4[i] = byte2float(buffer, 4 * i + 2);
-                            }
-
-                            if (mTrajectoryStreamCallback != null && isConnecting()) {
-                                Message message = handler.obtainMessage();
-                                message.what = TRAJECTORY;
-                                Bundle bundle = new Bundle();
-                                bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
-                                message.setData(bundle);
-                                message.sendToTarget();
-                            }
-                        }
-
-                        if(length == 40010) {
                             Log.d(TAG, "run: " + buffer[0] + " " + buffer[1]);
-                            if (buffer[0] == 90 && buffer[1] == -91) {
-                                Log.d(TAG,"slam map data header currect");
+                            if((buffer[0] == rev_data.head[0]) && (buffer[1] == rev_data.head[1])) {
+                                rev_data.length = buffer[6]<<24 & 0xff000000 + buffer[5]<<16 & 0xff0000 + buffer[4]<<8 & 0xff00 + buffer[3];
 
-                                if (mMappingStreamCallback != null && isConnecting()) {
-                                    Message message = handler.obtainMessage();
-                                    message.what = MAPPING;
-                                    Bundle bundle = new Bundle();
-                                    bundle.putByteArray("mapping_buffer", buffer);
-                                    message.setData(bundle);
-                                    message.sendToTarget();
+                                if (buffer[2] == query_data) {
+                                    rev_data.query_id = buffer[2];
+                                    if (buffer[7] == 90 && buffer[8] == -91) {
+                                        Log.d(TAG,"trajectory data correct");
+
+                                        // 接收线程解析数据，多次调用耗费时间
+                                        for (int i = 0; i < 16; i++)
+                                            Matrix_4x4[i] = byte2float(buffer, 4 * i + 9);
+
+                                        if (mTrajectoryStreamCallback != null && isConnecting()) {
+                                            Message message = handler.obtainMessage();
+                                            message.what = TRAJECTORY;
+                                            Bundle bundle = new Bundle();
+                                            bundle.putFloatArray("trajectory_buffer", Matrix_4x4);
+                                            message.setData(bundle);
+                                            message.sendToTarget();
+                                        }
+                                    }
+
+                                    if (buffer[7] == -91 && buffer[8] == 90) {
+                                        Log.d(TAG,"map data correct");
+
+                                        if (mMappingStreamCallback != null && isConnecting()) {
+                                            Message message = handler.obtainMessage();
+                                            message.what = MAPPING;
+                                            Bundle bundle = new Bundle();
+                                            bundle.putByteArray("mapping_buffer", buffer);
+                                            message.setData(bundle);
+                                            message.sendToTarget();
+                                        }
+                                    }
                                 }
                             }
                         }
+                        inputStream.close();
+                    }
 
 //                        for (int i = 0; i < 16; i++) {
 //                            Matrix_4x4[i] = byte2float(buffer, 4 * i);
@@ -221,7 +244,6 @@ public class Create2 {
 //                            message.sendToTarget();
 //                        }
 
-                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -233,6 +255,7 @@ public class Create2 {
     private static Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message message) {
+            Log.d(TAG, "handleMessage: " + " " + Thread.currentThread().getName());
             switch (message.what){
                 case TRAJECTORY:
                     Bundle bundle = message.getData();
@@ -293,7 +316,32 @@ public class Create2 {
     }
 
     private boolean send(int opcode) {
-        return write(new byte[] { (byte) (opcode & 0xFF) });
+//        return write(new byte[] { (byte) (opcode & 0xFF) });
+        return write(new byte[] {
+                (byte) (0xa5 & 0xFF), // head
+                (byte) (0x5a & 0xFF),
+                (byte) (2 & 0xFF), // query_id
+                (byte) (1 & 0xFF), // length
+                (byte) (0),
+                (byte) (0),
+                (byte) (0),
+                (byte) (opcode & 0xFF) // data
+        });
+    }
+
+    public boolean request(int a, int b) {
+//        return write(new byte[] { (byte) (opcode & 0xFF) });
+        return write(new byte[] {
+                (byte) (0xa5 & 0xFF), // head
+                (byte) (0x5a & 0xFF),
+                (byte) (2 & 0xFF), // query_id
+                (byte) (2 & 0xFF), // length
+                (byte) (0),
+                (byte) (0),
+                (byte) (0),
+                (byte) (a & 0xFF), // data
+                (byte) (b & 0xFF)
+        });
     }
 
     private boolean send(int opcode, byte data) {
@@ -304,12 +352,26 @@ public class Create2 {
     }
 
     private boolean send(int opcode, int data0, int data1) {
+//        return write(new byte[] {
+//                (byte) (opcode & 0xFF),
+//                (byte) ((data0 >> 8) & 0xFF),
+//                (byte) ((data0) & 0xFF),
+//                (byte) ((data1 >> 8) & 0xFF),
+//                (byte) ((data1) & 0xFF),
+//        });
         return write(new byte[] {
-                (byte) (opcode & 0xFF),
+                (byte) (0xa5 & 0xFF), // head
+                (byte) (0x5a & 0xFF),
+                (byte) (2 & 0xFF), // query_id
+                (byte) (4 & 0xFF), // length
+                (byte) (0),
+                (byte) (0),
+                (byte) (0),
+                (byte) (opcode & 0xFF), // data
                 (byte) ((data0 >> 8) & 0xFF),
                 (byte) ((data0) & 0xFF),
                 (byte) ((data1 >> 8) & 0xFF),
-                (byte) ((data1) & 0xFF),
+                (byte) ((data1) & 0xFF)
         });
     }
 
@@ -317,9 +379,10 @@ public class Create2 {
         try {
             synchronized (mStreamSync) {
                 Log.d(TAG, "write: " + socket + "   " + outputStream);
-                Log.d(TAG, "write: " + data[0]);
+                Log.d(TAG, "write: " + data[0] + " " + data[1]);
                 outputStream.write(data);
                 outputStream.flush();
+                outputStream.close();
             }
             return true;
         } catch (IOException e) {

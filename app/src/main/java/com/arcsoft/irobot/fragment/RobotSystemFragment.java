@@ -50,7 +50,7 @@ public class RobotSystemFragment extends Fragment {
 
         getFragmentManager().beginTransaction()
                 .replace(R.id.container_control, RobotControlFragment.newInstance())
-//                .replace(R.id.container_camera, RobotCameraFragment.newInstance())
+                .replace(R.id.container_camera, RobotCameraFragment.newInstance())
                 .commit();
         return view;
     }

@@ -61,6 +61,9 @@ public class RobotMappingFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (create2 != null && create2.isConnecting()) {
+            create2.request(-91,90);
+        }
         // Update status when navigating back
     }
 

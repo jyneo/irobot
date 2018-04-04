@@ -103,6 +103,10 @@ public class RobotTrajectoryFragment extends Fragment{
     @Override
     public void onResume() {
         super.onResume();
+        if (create2 != null && create2.isConnecting()) {
+            create2.request(90, -91);
+        }
+
         mMapViewUpdateTimer = new Timer();
         mMapViewUpdateTimer.schedule(new TimerTask() {
             @Override

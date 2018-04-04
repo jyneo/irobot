@@ -46,10 +46,12 @@ import com.arcsoft.irobot.view.AutoFitTextureView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -600,9 +602,10 @@ public class RobotCameraFragment extends Fragment
     }
 
     private String getVideoFilePath(Context context) {
+        String dataStr = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH).format(System.currentTimeMillis());
         final File dir = context.getExternalFilesDir(null);
         return (dir == null ? "" : (dir.getAbsolutePath() + "/"))
-                + System.currentTimeMillis() + ".mp4";
+                + dataStr + ".mp4";
     }
 
     private void startRecordingVideo() {
